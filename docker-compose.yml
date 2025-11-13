@@ -1,0 +1,47 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: arcoirispos_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: arcoirispos_dev
+      POSTGRES_USER: arcoiris_user
+      POSTGRES_PASSWORD: your_secure_password
+      PGDATA: /var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U arcoiris_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  fastapi:
+    build: ./arcoirispos-backend
+    container_name: arcoirispos_backend
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://arcoiris_user:your_secure_password@postgres:5432/arcoirispos_dev
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+
+  react:
+    build: ./arcoirispos-frontend
+    container_name: arcoirispos_frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    stdin_open: true
+    tty: true
+    command: ["npm", "start"]
+
+volumes:
+  postgres_data:

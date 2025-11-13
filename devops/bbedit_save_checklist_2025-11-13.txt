@@ -1,0 +1,56 @@
+🟦 Your BBEdit Save Checklist (You Requested This)
+
+A simple guide you can add to your internal /docs/editor/ folder later.
+
+📄 BBEdit Save Checklist for Dev Files
+
+(For YAML, SQL, Python, Markdown, JSON)
+
+1. File Format
+
+Menu → File → Save As… → Format: “Text”
+
+2. Encoding
+
+UTF-8 (no BOM)
+Shown in the document status bar bottom-right.
+
+3. Line Endings
+
+Use LF (Unix style).
+BBEdit defaults to this, but you can check the status bar.
+
+4. Tabs vs Spaces
+
+Spaces only, no tabs.
+YAML breaks with tabs.
+
+5. Smart Characters
+
+Ensure these are OFF:
+
+Smart Quotes
+
+Smart Dashes
+
+Smart Replacements
+
+6. Invisibles (Optional Safety Check)
+
+Text → Show Invisible Characters
+Look for:
+
+spaces (•)
+
+newlines (⏎)
+→ No weird squares or hidden characters
+
+7. Filename
+
+*.yml or *.yaml for YAML
+
+*.sql for migrations
+
+*.md for documentation
+
+*.py for backend scripts

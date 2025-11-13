@@ -1,0 +1,166 @@
+################################################################################
+# GLOBAL / OS STUFF
+################################################################################
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+
+
+################################################################################
+# PYTHON BACKEND (FastAPI)
+################################################################################
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+.venv/
+env/
+venv/
+ENV/
+
+# Python tooling
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+pytest_cache/
+.pytest_cache/
+*.cover
+*.py,cover
+coverage.xml
+*.log
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# pylint
+pylint_report.txt
+
+# pyright
+pyrightconfig.json
+
+# SQLite (if ever used locally)
+*.db
+*.sqlite3
+
+# IDE settings for Python
+.spyproject/
+.idea/
+
+
+################################################################################
+# NODE / REACT FRONTEND
+################################################################################
+
+# Dependencies
+node_modules/
+
+# React/Vite build outputs
+dist/
+build/
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local env files (never commit credentials)
+.env
+.env.*
+!.env.example
+
+
+################################################################################
+# DOCKER
+################################################################################
+
+# Docker build artifacts
+docker-compose.override.yml
+.docker/
+
+# Container logs
+*.log
+logs/
+log/
+*.pid
+
+
+################################################################################
+# POSTGRES / DATABASE
+################################################################################
+
+# Local PG data directories (never commit local DB files!)
+pgdata/
+postgres_data/
+*.sql~
+*.dump
+*.backup
+
+
+################################################################################
+# PROJECT-SPECIFIC IGNORE RULES
+################################################################################
+
+# VS Code settings
+.vscode/
+
+# PyCharm
+.idea/
+
+# Temporary working dirs
+tmp/
+temp/
+scratch/
+
+# BBEdit settings files
+*.bbprojectd/
+
+
+################################################################################
+# DOCUMENTATION / ASSETS
+################################################################################
+
+# Export artifacts
+*.pdf
+*.png
+*.jpg
+*.jpeg
+
+# Your generated system diagrams if temporary
+docs/diagrams/drafts/
+
+# Backups
+*.bak
+*.old
+
+
+################################################################################
+# END OF FILE
+################################################################################
