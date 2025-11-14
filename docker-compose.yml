@@ -8,33 +8,41 @@ services:
     environment:
       POSTGRES_DB: arcoirispos_dev
       POSTGRES_USER: arcoiris_user
-      POSTGRES_PASSWORD: your_secure_password
+      POSTGRES_PASSWORD: ArcoirisDevP@ss2025
       PGDATA: /var/lib/postgresql/data
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./backend/database/migrations:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U arcoiris_user"]
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U arcoiris_user -d arcoirispos_dev"]
+      interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 20
+      start_period: 10s
 
   fastapi:
-    build: ./arcoirispos-backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     container_name: arcoirispos_backend
     restart: always
     depends_on:
       postgres:
         condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+asyncpg://arcoiris_user:ArcoirisDevP@ss2025@postgres:5432/arcoirispos_dev
     ports:
       - "8000:8000"
-    environment:
-      DATABASE_URL: postgresql+asyncpg://arcoiris_user:your_secure_password@postgres:5432/arcoirispos_dev
-    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+    command: >
+      bash -c "python src/wait_for_db.py &&
+      uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"
 
   react:
-    build: ./arcoirispos-frontend
+    build:
+      context: ./frontend/arcoiris-frontend
+      dockerfile: Dockerfile
     container_name: arcoirispos_frontend
     restart: always
     ports:
