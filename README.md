@@ -1,28 +1,130 @@
+# 🌈 ArcoírisPOS  
+### Modular Point-of-Sale (POS) + Accounting System  
+**FastAPI • PostgreSQL • React • Docker • Multi-Tenant Architecture**
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Status-In%20Development-yellow?style=flat-square" />
+  <img src="https://img.shields.io/badge/Backend-FastAPI-009688?style=flat-square" />
+  <img src="https://img.shields.io/badge/Database-PostgreSQL-316192?style=flat-square" />
+  <img src="https://img.shields.io/badge/Frontend-React-00d8ff?style=flat-square" />
+  <img src="https://img.shields.io/badge/License-Proprietary-lightgrey?style=flat-square" />
+</p>
+
 ---
 
-# 📄 **README.md (ArcoírisPOS — Full Version)**
+# 📘 Table of Contents
 
-```markdown
-# 🌈 ArcoírisPOS  
-### A Modular Point-of-Sale + Accounting System (FastAPI • PostgreSQL • React)
+- [Overview](#overview)
+- [Features](#features)
+- [Technology Stack](#technology-stack)
+- [Architecture Overview](#architecture-overview)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+  - [Clone the Repository](#1-clone-the-repository)
+  - [Docker Development](#docker-based-local-development)
+  - [Manual Backend Setup](#backend-fastapi)
+  - [Manual Frontend Setup](#frontend-react)
+- [Database Schema](#🧮-data-model-overview)
+- [Environment Variables](#📦-environment-variables)
+- [Roadmap](#🔭-project-roadmap)
+- [Contributing](#🧑‍💻-contributing)
+- [License](#🛡-license)
+- [Author](#🌟-author)
 
-ArcoírisPOS is the foundation of a long-term, multi-module business suite designed
-to grow into a full accounting platform and QuickBooks Online competitor.  
-The architecture emphasizes:
+---
 
-- Clean separation of POS, Inventory, Core, and Accounting domains  
-- FastAPI backend with async PostgreSQL  
-- React frontend  
-- Docker-based local development  
-- Multi-tenant SaaS structure  
-- Enterprise-ready data model (double-entry accounting)  
+# 🧭 Overview
+
+**ArcoírisPOS** is a multi-module Point-of-Sale and Accounting platform designed for:
+
+- retail businesses  
+- restaurants  
+- service organizations  
+- SaaS deployments  
+- enterprise-grade bookkeeping integrations  
+
+Its long-term goal is to evolve into a full accounting platform and a direct competitor to **QuickBooks Online**, with a strong emphasis on:
+
+- modular design  
+- multi-tenant organization management  
+- a clean, extensible architecture  
+- enterprise-ready data model  
+
+---
+
+# ✨ Features
+
+### POS Core
+- Customers, items, terminals  
+- Sales, sale lines, payment handling  
+- Taxes, discounts, and promotions  
+
+### Inventory Management
+- Items & categories  
+- Stock levels & movements  
+- Location-based multi-store tracking  
+
+### Accounting Engine (In Progress)
+- Double-entry ledger  
+- Chart of accounts  
+- Journal entries & lines  
+- AR/AP foundations  
+
+### Developer-Friendly
+- Full local Docker environment  
+- Hot-reload FastAPI backend  
+- Hot-reload React frontend  
+- SQL-based migration system  
+- Clean modular separation: `pos/`, `inv/`, `acct/`, `core/`  
+
+---
+
+# 🛠 Technology Stack
+
+| Layer       | Technology                 |
+|-------------|-----------------------------|
+| Backend     | FastAPI (Python 3.10+)      |
+| Database    | PostgreSQL (asyncpg)        |
+| Frontend    | React (CRA / Vite optional) |
+| DevOps      | Docker + Docker Compose     |
+| Auth        | JWT / OAuth2                |
+| Architecture| Domain-Driven Design (DDD)  |
+
+---
+
+# 🏗 Architecture Overview
+
+Below is a conceptual structure of the system:
+
+```
+┌──────────────────────────────┐
+│          Frontend            │
+│          (React)             │
+└───────────────┬──────────────┘
+                │ REST / JSON
+┌───────────────▼──────────────┐
+│        FastAPI Backend        │
+│  pos | inv | core | acct      │
+└───────────────┬──────────────┘
+                │ SQL / Async
+┌───────────────▼──────────────┐
+│           PostgreSQL          │
+│  migrations | seeds | schemas │
+└──────────────────────────────┘
+```
+
+The project follows **domain partitioning**, separating business logic into clean modules:
+
+- `core/` — organizations, users, auth  
+- `pos/` — customer, sales, payments  
+- `inv/` — stock & item management  
+- `acct/` — journal / ledger engine  
 
 ---
 
 # 🧱 Project Structure
 
-```
-
+````markdown
 arcoirispos/
 │
 ├── docker-compose.yml
@@ -48,246 +150,13 @@ arcoirispos/
 │   └── .env.example
 │
 └── frontend/
-├── src/
-├── public/
-├── package.json
-└── .env.development
+    ├── src/
+    ├── public/
+    ├── package.json
+    └── .env.development
+    
+    **Daniel Joseph LeBlanc**  
+Foreside Holdings LLC  
+Architect • Developer • Designer  
+FastAPI • PostgreSQL • React • Systems Engineering
 
-````
-
----
-
-# 🚀 Getting Started
-
-## 1. Clone the Repository
-
-```bash
-git clone https://github.com/<your-username>/arcoirispos.git
-cd arcoirispos
-````
-
----
-
-# 🐳 Docker-Based Local Development
-
-This project uses **Docker Compose** for:
-
-* PostgreSQL
-* FastAPI backend
-* React development server
-
-To start everything:
-
-```bash
-docker-compose up --build
-```
-
-### Services will be available at:
-
-| Service        | URL                                                      |
-| -------------- | -------------------------------------------------------- |
-| FastAPI        | [http://localhost:8000](http://localhost:8000)           |
-| API Docs       | [http://localhost:8000/docs](http://localhost:8000/docs) |
-| React Frontend | [http://localhost:3000](http://localhost:3000)           |
-| PostgreSQL     | localhost:5432                                           |
-
----
-
-# 🗄 Database Setup (PostgreSQL)
-
-If running manually (not through Docker):
-
-```sql
-CREATE DATABASE arcoirispos_dev;
-CREATE USER arcoiris_user WITH PASSWORD 'YourSecurePassword';
-GRANT ALL PRIVILEGES ON DATABASE arcoirispos_dev TO arcoiris_user;
-```
-
-Run migrations:
-
-```bash
-psql -U arcoiris_user -d arcoirispos_dev -f backend/database/migrations/001_init_arcoirispos.sql
-psql -U arcoiris_user -d arcoirispos_dev -f backend/database/migrations/002_indexes.sql
-```
-
----
-
-# 🐍 Backend (FastAPI)
-
-## Run Backend Manually (Alternative to Docker)
-
-Create virtual environment:
-
-```bash
-cd backend
-python -m venv .venv
-source .venv/bin/activate  # On macOS/Linux
-# OR
-.venv\Scripts\activate     # On Windows
-```
-
-Install dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-Run server:
-
-```bash
-uvicorn src.main:app --reload
-```
-
----
-
-# ⚛️ Frontend (React)
-
-From the `frontend/` directory:
-
-```bash
-npm install
-npm start
-```
-
-This launches the development server at:
-
-```
-http://localhost:3000
-```
-
----
-
-# 🧮 Data Model Overview
-
-ArcoírisPOS includes a full PostgreSQL schema across 4 main domains:
-
-### **core/**
-
-* Organizations (multi-tenant)
-* Users & Roles
-* Authentication & session future support
-
-### **pos/**
-
-* Customers
-* Terminals
-* Sales
-* Sale Lines
-* Payments
-* Tax Rates
-
-### **inv/**
-
-* Items
-* Locations
-* Stock Levels
-* Stock Movements
-
-### **acct/**
-
-* Chart of Accounts
-* Journal Entries
-* Journal Lines
-* Bank Accounts
-* Customer Balances
-
-SQL migrations included in `/backend/database/migrations`.
-
----
-
-# 📦 Environment Variables
-
-Backend `.env.example`:
-
-```env
-DATABASE_URL=postgresql+asyncpg://arcoiris_user:password@localhost:5432/arcoirispos_dev
-SECRET_KEY=replace_with_secure_key
-```
-
-Frontend `.env.development`:
-
-```env
-REACT_APP_API_URL=http://localhost:8000
-```
-
-Copy these files and remove the `.example` suffix to activate.
-
----
-
-# 🔭 Project Roadmap
-
-### Phase 1 — Foundation
-
-✔ Data model
-✔ POS basics (sales, customers, items)
-✔ Docker environment
-✔ FastAPI scaffold
-
-### Phase 2 — Operational POS
-
-* Inventory v1
-* Payments integration
-* Basic reporting
-* Shift/cash drawer tools
-
-### Phase 3 — Accounting Engine
-
-* Ledger + journal system
-* Chart of accounts
-* AR/AP syncing
-* P&L, Balance Sheet
-
-### Phase 4 — SaaS Platform
-
-* Multi-tenant isolation
-* Subscription billing
-* Notifications
-* Event bus architecture
-
-### Phase 5 — Nano Business Suite
-
-* Payroll
-* Timecards
-* Purchasing
-* Inventory 2.0
-* Business intelligence
-
-### Phase 6 — Hardware & Enterprise
-
-* Branded POS terminals
-* Kiosk mode OS
-* In-house payment processor
-* App marketplace
-
----
-
-# 🧑‍💻 Contributing
-
-To contribute:
-
-```bash
-git checkout -b feature/my-feature
-# make changes
-git commit -m "Add new feature"
-git push origin feature/my-feature
-```
-
-Then submit a Pull Request.
-
----
-
-# 🛡 License
-
-To be added.
-
----
-
-# 🌟 Author
-
-**Daniel Joseph LeBlanc**
-Foreside Holdings LLC / ArcoírisPOS Project
-FastAPI • PostgreSQL • React • System Architecture
-
-```
-
----

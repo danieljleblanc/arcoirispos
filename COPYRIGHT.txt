@@ -1,0 +1,18 @@
+Copyright © 2025
+Foreside Holdings LLC
+All rights reserved.
+
+This software and all associated assets—including but not limited to the
+source code, database schema, file structures, documentation, diagrams,
+technical specifications, design systems, and related components—are the
+exclusive intellectual property of Foreside Holdings LLC.
+
+No portion of this material may be copied, reproduced, stored, or
+transmitted in any form, nor used to create derivative works, without
+the express written permission of Foreside Holdings LLC.
+
+Unauthorized use, distribution, or reproduction of this software or any
+part thereof is strictly prohibited and may result in legal action.
+
+For permissions, licensing, or commercial inquiries, contact:
+legal@foresideholdings.com
