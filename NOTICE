@@ -1,0 +1,54 @@
+NOTICE
+ArcoírisPOS — Foreside Holdings LLC
+Copyright © 2025 Foreside Holdings LLC
+All rights reserved.
+
+This software product includes proprietary code developed by
+Foreside Holdings LLC as part of the ArcoírisPOS system.
+
+---
+
+THIRD-PARTY SOFTWARE AND OPEN-SOURCE COMPONENTS
+
+This project may include libraries or dependencies that are licensed
+under their own respective open-source or third-party licenses.
+Such components remain the property of their respective authors, and
+their use is governed by the applicable license terms.
+
+Examples include (but are not limited to):
+
+- Python and the Python standard library
+- FastAPI framework (MIT License)
+- Starlette ASGI toolkit (BSD License)
+- Pydantic (MIT License)
+- Uvicorn ASGI server (BSD License)
+- asyncpg PostgreSQL driver (MIT License)
+- PostgreSQL (PostgreSQL License)
+- React and associated frontend libraries (MIT License)
+- Node.js and npm tooling (various open-source licenses)
+- Docker and Docker Compose (Apache 2.0 License)
+
+Full license texts for these components can be found in their respective
+project repositories or documentation.
+
+No open-source component included in this software modifies or supersedes
+the proprietary ownership and copyright of the ArcoírisPOS system itself.
+
+---
+
+USE OF THIS NOTICE FILE
+
+This NOTICE file is provided to satisfy open-source attribution rules,
+including (but not limited to):
+
+- MIT License requirements
+- Apache License 2.0 Section 4(d)
+- BSD-style attribution notices
+
+It does not grant additional permissions or rights to the proprietary
+ArcoírisPOS system or any part thereof.
+
+For licensing questions or inquiries regarding commercial use, contact:
+
+legal@foresideholdings.com
+Foreside Holdings LLC
