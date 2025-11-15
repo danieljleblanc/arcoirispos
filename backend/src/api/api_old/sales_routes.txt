@@ -1,0 +1,89 @@
+# backend/src/api/pos/sales_routes.py
+
+from typing import List
+from uuid import UUID
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from core.database import get_session
+from models import Sale, SaleLine, Payment
+from schemas.pos_schemas import (
+    SaleCreate,
+    SaleReadWithLinesAndPayments,
+)
+
+router = APIRouter(prefix="/sales", tags=["sales"])
+
+
+@router.get("/", response_model=List[SaleReadWithLinesAndPayments])
+async def list_sales(
+    org_id: UUID,
+    limit: int = 100,
+    offset: int = 0,
+    session: AsyncSession = Depends(get_session),
+):
+    stmt = (
+        select(Sale)
+        .where(Sale.org_id == org_id)
+        .order_by(Sale.sale_date.desc())
+        .limit(limit)
+        .offset(offset)
+    )
+    result = await session.execute(stmt)
+    sales = result.scalars().unique().all()
+
+    # Eager load lines & payments (simplest variant: rely on relationships)
+    for sale in sales:
+        # Access relationships so they load if lazy
+        _ = sale.sale_lines
+        _ = sale.payments
+
+    return sales
+
+
+@router.get("/{sale_id}", response_model=SaleReadWithLinesAndPayments)
+async def get_sale(
+    sale_id: UUID,
+    session: AsyncSession = Depends(get_session),
+):
+    stmt = select(Sale).where(Sale.sale_id == sale_id)
+    result = await session.execute(stmt)
+    sale = result.scalar_one_or_none()
+    if not sale:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Sale not found")
+
+    _ = sale.sale_lines
+    _ = sale.payments
+
+    return sale
+
+
+@router.post("/", response_model=SaleReadWithLinesAndPayments, status_code=status.HTTP_201_CREATED)
+async def create_sale(
+    payload: SaleCreate,
+    session: AsyncSession = Depends(get_session),
+):
+    data = payload.dict()
+    lines_data = data.pop("lines")
+    payments_data = data.pop("payments", [])
+
+    sale = Sale(**data)
+
+    # attach lines
+    for line_data in lines_data:
+        sale_line = SaleLine(**line_data)
+        sale.sale_lines.append(sale_line)
+
+    # attach payments
+    for pay_data in payments_data:
+        payment = Payment(**pay_data)
+        sale.payments.append(payment)
+
+    session.add(sale)
+    await session.commit()
+    await session.refresh(sale)
+    _ = sale.sale_lines
+    _ = sale.payments
+    return sale

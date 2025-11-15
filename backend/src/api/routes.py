@@ -1,18 +1,26 @@
+# backend/src/api/routes.py
+
 from fastapi import APIRouter
-from src.api.sales_routes import router as sales_router
-from src.api.item_routes import router as item_router
-from src.api.customer_routes import router as customer_router
-from src.api.inventory_vendor_routes import router as vendor_router
-from src.api.inventory_stock_routes import router as stock_router
-from src.api.inventory_transaction_routes import router as transaction_router
+
+from .customer_routes import router as customers_router
+from .items_routes import router as items_router
+from .sales_routes import router as sales_router
+from .locations_routes import router as locations_router
+from .stock_levels_routes import router as stock_levels_router
+from .stock_movements_routes import router as stock_movements_router
+
+api_router = APIRouter()
+
+# POS
+api_router.include_router(customers_router, prefix="/pos")
+api_router.include_router(sales_router, prefix="/pos")
+
+# Inventory
+api_router.include_router(items_router, prefix="/inv")
+api_router.include_router(locations_router, prefix="/inv")
+api_router.include_router(items_router, prefix="/inv")
+api_router.include_router(locations_router, prefix="/inv")
+api_router.include_router(stock_levels_router, prefix="/inv")
+api_router.include_router(stock_movements_router, prefix="/inv")
 
 
-
-router = APIRouter()
-
-router.include_router(sales_router)
-router.include_router(item_router)
-router.include_router(customer_router)
-router.include_router(vendor_router)
-router.include_router(stock_router)
-router.include_router(transaction_router)

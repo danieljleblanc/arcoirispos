@@ -1,0 +1,89 @@
+backend
+├── database
+│   ├── migrations
+│   │   ├── 001_init_arcoirispos.sql
+│   │   ├── 001_migration_index.sql
+│   │   └── 003_sales_OLD.txt
+│   ├── schemas
+│   ├── seeds
+│   └── src
+├── Dockerfile
+├── requirements.txt
+├── src
+│   ├── acct
+│   ├── api
+│   │   ├── __init__.py
+│   │   ├── api_old
+│   │   │   ├── customer_routes.txt
+│   │   │   ├── inventory_stock_routes.txt
+│   │   │   ├── inventory_transaction_routes.txt
+│   │   │   ├── inventory_vendor_routes.txt
+│   │   │   ├── item_routes.txt
+│   │   │   ├── purchase_order_routes.txt
+│   │   │   └── sales_routes.txt
+│   │   ├── customer_routes.py
+│   │   ├── items_routes.py
+│   │   ├── routes.py
+│   │   └── sales_routes.py
+│   ├── config
+│   ├── core
+│   │   ├── __init__.py
+│   │   ├── config.py
+│   │   └── database.py
+│   ├── inv
+│   ├── main.py
+│   ├── models
+│   │   ├── __init__.py
+│   │   └── models.py
+│   ├── models_old
+│   │   ├── base.txt
+│   │   ├── customer.txt
+│   │   ├── inventory_transaction.txt
+│   │   ├── item.txt
+│   │   ├── payment.txt
+│   │   ├── purchase_order_line.txt
+│   │   ├── purchase_order.txt
+│   │   ├── sale.txt
+│   │   ├── stock_level.txt
+│   │   └── vendor.txt
+│   ├── pos
+│   ├── schemas
+│   │   ├── __init__.py
+│   │   ├── acct_schemas.py
+│   │   ├── checkout_schemas.py
+│   │   ├── core_schemas.py
+│   │   ├── inv_schemas.py
+│   │   ├── pos_schemas.py
+│   │   └── schemas_old
+│   │       ├── customer_schemas.txt
+│   │       ├── inventory_transaction_schemas.txt
+│   │       ├── item_schemas.txt
+│   │       ├── payment_schemas.txt
+│   │       ├── purchase_order_schemas.txt
+│   │       ├── sale_schemas.txt
+│   │       ├── stock_level_schemas.txt
+│   │       └── vendor_schemas.txt
+│   ├── services
+│   │   ├── __init__.py
+│   │   ├── acct
+│   │   │   ├── __init__.py
+│   │   │   └── accounts.py
+│   │   ├── base_repository.py
+│   │   ├── inv
+│   │   │   ├── __init__.py
+│   │   │   └── items.py
+│   │   ├── pos
+│   │   │   ├── __init__.py
+│   │   │   ├── customers.py
+│   │   │   └── sales.py
+│   │   └── services_old
+│   │       ├── customer_service.txt
+│   │       ├── inventory_transaction_service.txt
+│   │       ├── purchase_order_service.txt
+│   │       ├── sales_service.txt
+│   │       ├── stock_service.txt
+│   │       └── vendor_service.txt
+│   └── wait_for_db.py
+└── tests
+
+24 directories, 63 files

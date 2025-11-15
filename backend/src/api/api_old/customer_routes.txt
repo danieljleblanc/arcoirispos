@@ -1,0 +1,70 @@
+# backend/src/api/pos/customers_routes.py
+
+from typing import List
+from uuid import UUID
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from core.database import get_session
+from models import Customer
+from schemas.pos_schemas import (
+    CustomerCreate,
+    CustomerRead,
+    CustomerUpdate,
+)
+from services.customer_service import customer_service
+
+router = APIRouter(prefix="/customers", tags=["customers"])
+
+
+@router.get("/", response_model=List[CustomerRead])
+async def list_customers(
+    org_id: UUID,
+    limit: int = 100,
+    offset: int = 0,
+    session: AsyncSession = Depends(get_session),
+):
+    customers = await customer_service.get_by_org(session, org_id, limit, offset)
+    return customers
+
+
+@router.get("/{customer_id}", response_model=CustomerRead)
+async def get_customer(
+    customer_id: UUID,
+    session: AsyncSession = Depends(get_session),
+):
+    customer = await customer_service.get_by_id(session, customer_id)
+    if not customer:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Customer not found")
+    return customer
+
+
+@router.post("/", response_model=CustomerRead, status_code=status.HTTP_201_CREATED)
+async def create_customer(
+    payload: CustomerCreate,
+    session: AsyncSession = Depends(get_session),
+):
+    obj_in = payload.dict()
+    customer: Customer = await customer_service.create(session, obj_in)
+    await session.commit()
+    await session.refresh(customer)
+    return customer
+
+
+@router.patch("/{customer_id}", response_model=CustomerRead)
+async def update_customer(
+    customer_id: UUID,
+    payload: CustomerUpdate,
+    session: AsyncSession = Depends(get_session),
+):
+    customer = await customer_service.get_by_id(session, customer_id)
+    if not customer:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Customer not found")
+
+    for field, value in payload.dict(exclude_unset=True).items():
+        setattr(customer, field, value)
+
+    await session.commit()
+    await session.refresh(customer)
+    return customer

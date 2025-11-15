@@ -1,6 +1,5 @@
-version: "3.9"
-
 services:
+
   postgres:
     image: postgres:16
     container_name: arcoirispos_postgres
@@ -14,7 +13,8 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./backend/database/migrations:/docker-entrypoint-initdb.d
+      # Absolute path with correct case so Docker Desktop can mount it
+      - /Volumes/dev/repos/arcoirispos/backend/database/migrations:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U arcoiris_user -d arcoirispos_dev"]
       interval: 5s
@@ -32,7 +32,8 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql+asyncpg://arcoiris_user:ArcoirisDevP@ss2025@postgres:5432/arcoirispos_dev
+      DATABASE_URL_ASYNC: "postgresql+asyncpg://arcoiris_user:ArcoirisDevP%40ss2025@postgres:5432/arcoirispos_dev"
+      DATABASE_URL: "postgresql://arcoiris_user:ArcoirisDevP%40ss2025@postgres:5432/arcoirispos_dev"
     ports:
       - "8000:8000"
     command: >
