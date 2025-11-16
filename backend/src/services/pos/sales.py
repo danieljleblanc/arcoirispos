@@ -1,12 +1,9 @@
-# backend/src/services/pos/sales.py
-
 from typing import List, Optional
 from uuid import UUID
 from datetime import datetime
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import update
 
 from src.models import Sale, SaleLine, Payment
 from src.services.base_repository import BaseRepository
@@ -18,60 +15,63 @@ class SalesService(BaseRepository[Sale]):
     def __init__(self) -> None:
         super().__init__(Sale)
 
+    # ---------------------------------------------------------
+    # LIST SALES (EXCLUDES ARCHIVED)
+    # ---------------------------------------------------------
     async def get_by_org(
-    session: AsyncSession,
-    org_id: UUID,
-    limit: int = 100,
-    offset: int = 0,
-) -> List[Sale]:
-    stmt = (
-        select(Sale)
-        .where(Sale.org_id == org_id)
-        .where(Sale.deleted_at.is_(None))   # ⬅️ NEW FILTER
-        .order_by(Sale.sale_date.desc())
-        .limit(limit)
-        .offset(offset)
-    )
-    result = await session.execute(stmt)
-    return result.scalars().unique().all()
+        self,
+        session: AsyncSession,
+        org_id: UUID,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> List[Sale]:
+        stmt = (
+            select(Sale)
+            .where(Sale.org_id == org_id)
+            .where(Sale.status != "archived")   # <–– Option A soft-delete filter
+            .order_by(Sale.sale_date.desc())
+            .limit(limit)
+            .offset(offset)
+        )
+        result = await session.execute(stmt)
+        return result.scalars().unique().all()
 
-   async def get_with_relations(
-    self,
-    session: AsyncSession,
-    sale_id: UUID,
-) -> Optional[Sale]:
-    stmt = (
-        select(Sale)
-        .where(Sale.sale_id == sale_id)
-        .where(Sale.deleted_at.is_(None))   # ⬅️ NEW FILTER
-    )
-    result = await session.execute(stmt)
-    sale = result.scalar_one_or_none()
+    # ---------------------------------------------------------
+    # GET SINGLE SALE + RELATIONS (EXCLUDES ARCHIVED)
+    # ---------------------------------------------------------
+    async def get_with_relations(
+        self,
+        session: AsyncSession,
+        sale_id: UUID,
+    ) -> Optional[Sale]:
+        stmt = (
+            select(Sale)
+            .where(Sale.sale_id == sale_id)
+            .where(Sale.status != "archived")   # <–– do not load archived
+        )
+        result = await session.execute(stmt)
+        sale = result.scalar_one_or_none()
 
-    if sale:
-        # force load relationships
-        _ = sale.sale_lines
-        _ = sale.payments
+        if sale:
+            # Access relationships so ORM loads them
+            _ = sale.sale_lines
+            _ = sale.payments
 
-    return sale
+        return sale
 
-
+    # ---------------------------------------------------------
+    # CREATE SALE (CALCULATED VIA CHECKOUT ENGINE)
+    # ---------------------------------------------------------
     async def create_sale(
         self,
         session: AsyncSession,
         payload: SaleCreate,
     ) -> Sale:
-        """
-        NEW VERSION:
-        - Calls checkout engine
-        - Applies subtotal, tax_total, grand_total, etc.
-        - Creates SaleLines + Payments based on calculated values
-        """
 
-        # 1. Run the checkout engine
+        # 1. Run checkout engine
         calc = await checkout_service.calculate(session, payload)
 
-        # 2. Create the Sale record with calculated totals
+        # 2. Create main Sale record
         sale = Sale(
             org_id=payload.org_id,
             terminal_id=payload.terminal_id,
@@ -93,7 +93,7 @@ class SalesService(BaseRepository[Sale]):
         session.add(sale)
         await session.flush()  # populate sale.sale_id
 
-        # 3. Create SaleLines from engine results
+        # 3. Create SaleLines based on engine results
         for raw_line, engine_line in zip(payload.lines, calc["lines"]):
             line = SaleLine(
                 sale_id=sale.sale_id,
@@ -110,7 +110,7 @@ class SalesService(BaseRepository[Sale]):
             )
             session.add(line)
 
-        # 4. Add payments (same as before)
+        # 4. Add payments
         for p in payload.payments:
             payment = Payment(
                 sale_id=sale.sale_id,
@@ -123,7 +123,7 @@ class SalesService(BaseRepository[Sale]):
             )
             session.add(payment)
 
-        # 5. Commit + return
+        # 5. Commit + refresh
         await session.commit()
         await session.refresh(sale)
 
@@ -133,22 +133,21 @@ class SalesService(BaseRepository[Sale]):
 
         return sale
 
-class SalesService(BaseRepository[Sale]):
-    ...
-
+    # ---------------------------------------------------------
+    # ARCHIVE SALE (SOFT DELETE VIA STATUS)
+    # ---------------------------------------------------------
     async def archive_sale(
         self,
         session: AsyncSession,
         sale_id: UUID,
     ) -> Optional[Sale]:
 
-        # Fetch sale
         sale = await self.get_with_relations(session, sale_id)
         if not sale:
             return None
 
-        # Soft-delete
-        sale.deleted_at = datetime.utcnow()
+        # Soft delete
+        sale.status = "archived"
 
         await session.commit()
         await session.refresh(sale)

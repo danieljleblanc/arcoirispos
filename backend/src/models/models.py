@@ -1,4 +1,5 @@
 from __future__ import annotations
+from enum import Enum
 
 import uuid
 from datetime import date, datetime
@@ -25,7 +26,11 @@ class Base(DeclarativeBase):
     """Base class for all ORM models."""
     pass
 
-
+class UserRole(str, Enum):
+    admin = "admin"
+    manager = "manager"
+    cashier = "cashier"
+    
 # ---------------------------------------------------------------------------
 # ENUM TYPE (already created in DB)
 # ---------------------------------------------------------------------------

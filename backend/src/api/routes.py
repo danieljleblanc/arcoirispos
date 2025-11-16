@@ -12,6 +12,8 @@ from .tax_rates_routes import router as tax_rates_router
 from .payments_routes import router as payments_router
 from .sale_lines_routes import router as sale_lines_router
 from .terminals_routes import router as terminals_router
+from .admin_stock_adjust_routes import router as admin_stock_adjust_router
+from .auth_routes import router as auth_router
 
 
 api_router = APIRouter()
@@ -32,5 +34,6 @@ api_router.include_router(items_router, prefix="/inv")
 api_router.include_router(locations_router, prefix="/inv")
 api_router.include_router(stock_levels_router, prefix="/inv")
 api_router.include_router(stock_movements_router, prefix="/inv")
+api_router.include_router(admin_stock_adjust_router, prefix="/inv")
 
-
+api_router.include_router(auth_router)

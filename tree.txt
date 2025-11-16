@@ -13,6 +13,7 @@ backend
 │   ├── acct
 │   ├── api
 │   │   ├── __init__.py
+│   │   ├── admin_stock_adjust_routes.py
 │   │   ├── api_old
 │   │   │   ├── customer_routes.txt
 │   │   │   ├── inventory_stock_routes.txt
@@ -21,18 +22,30 @@ backend
 │   │   │   ├── item_routes.txt
 │   │   │   ├── purchase_order_routes.txt
 │   │   │   └── sales_routes.txt
+│   │   ├── auth_routes.py
 │   │   ├── customer_routes.py
 │   │   ├── items_routes.py
 │   │   ├── locations_routes.py
+│   │   ├── payments_routes.py
 │   │   ├── routes.py
+│   │   ├── sale_lines_routes.py
 │   │   ├── sales_routes.py
 │   │   ├── stock_levels_routes.py
-│   │   └── stock_movements_routes.py
+│   │   ├── stock_movements_routes.py
+│   │   ├── tax_rates_routes.py
+│   │   └── terminals_routes.py
 │   ├── config
 │   ├── core
 │   │   ├── __init__.py
 │   │   ├── config.py
-│   │   └── database.py
+│   │   ├── database.py
+│   │   └── security
+│   │       ├── auth.py
+│   │       ├── dependencies.py
+│   │       ├── hashing.py
+│   │       ├── jwt_utils.py
+│   │       ├── permissions.py
+│   │       └── roles.py
 │   ├── inv
 │   ├── main.py
 │   ├── models
@@ -72,16 +85,25 @@ backend
 │   │   │   ├── __init__.py
 │   │   │   └── accounts.py
 │   │   ├── base_repository.py
+│   │   ├── core
+│   │   │   └── roles.py
 │   │   ├── inv
 │   │   │   ├── __init__.py
 │   │   │   ├── items.py
 │   │   │   ├── locations.py
+│   │   │   ├── stock_adjustments.py
 │   │   │   ├── stock_levels.py
 │   │   │   └── stock_movements.py
 │   │   ├── pos
 │   │   │   ├── __init__.py
+│   │   │   ├── checkout_service.py
+│   │   │   ├── checkout.py
 │   │   │   ├── customers.py
-│   │   │   └── sales.py
+│   │   │   ├── payments.py
+│   │   │   ├── sale_lines.py
+│   │   │   ├── sales.py
+│   │   │   ├── tax_rates.py
+│   │   │   └── terminals.py
 │   │   └── services_old
 │   │       ├── customer_service.txt
 │   │       ├── inventory_transaction_service.txt
@@ -92,4 +114,4 @@ backend
 │   └── wait_for_db.py
 └── tests
 
-24 directories, 69 files
+26 directories, 89 files

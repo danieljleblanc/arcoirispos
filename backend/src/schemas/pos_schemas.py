@@ -122,6 +122,16 @@ class SaleLineCreate(SaleLineBase):
     pass
 
 
+class SaleLineUpdate(BaseModel):
+    description: Optional[str] = None
+    quantity: Optional[Decimal] = None
+    unit_price: Optional[Decimal] = None
+    discount_amount: Optional[Decimal] = None
+    tax_id: Optional[UUID] = None
+    tax_amount: Optional[Decimal] = None
+    line_total: Optional[Decimal] = None
+
+
 class SaleLineRead(SaleLineBase):
     sale_line_id: UUID
     sale_id: UUID
@@ -144,6 +154,13 @@ class PaymentBase(BaseModel):
 
 class PaymentCreate(PaymentBase):
     sale_id: UUID
+
+class PaymentUpdate(BaseModel):
+    payment_method: Optional[str] = None
+    amount: Optional[Decimal] = None
+    currency: Optional[str] = None
+    external_ref: Optional[str] = None
+    processed_at: Optional[datetime] = None
 
 
 class PaymentRead(PaymentBase):

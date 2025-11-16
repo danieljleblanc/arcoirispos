@@ -41,6 +41,7 @@ async def get_item(
 async def create_item(
     payload: ItemCreate,
     session: AsyncSession = Depends(get_session),
+    user = Depends(require_roles(["admin", "owner"]))
 ):
     item = await item_service.create(session, payload.dict())
     await session.commit()
@@ -53,6 +54,7 @@ async def update_item(
     item_id: UUID,
     payload: ItemUpdate,
     session: AsyncSession = Depends(get_session),
+    user = Depends(require_roles(["admin", "owner"]))
 ):
     item = await item_service.get_by_id(session, item_id)
     if not item:

@@ -127,3 +127,23 @@ class StockMovementRead(StockMovementBase):
 
     class Config:
         orm_mode = True
+
+
+class StockAdjustmentBase(BaseModel):
+    org_id: UUID
+    item_id: UUID
+    location_id: UUID
+    quantity_delta: Decimal
+    reason: str = Field(..., description="Required reason for admin adjustment")
+
+
+class StockAdjustmentCreate(StockAdjustmentBase):
+    pass
+
+
+class StockAdjustmentRead(StockAdjustmentBase):
+    created_at: datetime
+    movement_id: UUID
+
+    class Config:
+        orm_mode = True
