@@ -23,8 +23,11 @@ backend
 │   │   │   └── sales_routes.txt
 │   │   ├── customer_routes.py
 │   │   ├── items_routes.py
+│   │   ├── locations_routes.py
 │   │   ├── routes.py
-│   │   └── sales_routes.py
+│   │   ├── sales_routes.py
+│   │   ├── stock_levels_routes.py
+│   │   └── stock_movements_routes.py
 │   ├── config
 │   ├── core
 │   │   ├── __init__.py
@@ -71,7 +74,10 @@ backend
 │   │   ├── base_repository.py
 │   │   ├── inv
 │   │   │   ├── __init__.py
-│   │   │   └── items.py
+│   │   │   ├── items.py
+│   │   │   ├── locations.py
+│   │   │   ├── stock_levels.py
+│   │   │   └── stock_movements.py
 │   │   ├── pos
 │   │   │   ├── __init__.py
 │   │   │   ├── customers.py
@@ -86,4 +92,4 @@ backend
 │   └── wait_for_db.py
 └── tests
 
-24 directories, 63 files
+24 directories, 69 files
