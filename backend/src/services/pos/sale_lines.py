@@ -16,13 +16,11 @@ class SaleLineService(BaseRepository[SaleLine]):
         self,
         session: AsyncSession,
         sale_id: UUID,
-        user = Depends(require_user)
     ) -> List[SaleLine]:
         stmt = (
             select(SaleLine)
             .where(SaleLine.sale_id == sale_id)
             .order_by(SaleLine.line_number.asc())
-            user = Depends(require_user)
         )
         result = await session.execute(stmt)
         return result.scalars().all()
@@ -31,7 +29,6 @@ class SaleLineService(BaseRepository[SaleLine]):
         self,
         session: AsyncSession,
         sale_line_id: UUID,
-        user = Depends(require_user)
     ) -> Optional[SaleLine]:
         stmt = select(SaleLine).where(SaleLine.sale_line_id == sale_line_id)
         result = await session.execute(stmt)
@@ -43,7 +40,6 @@ class SaleLineService(BaseRepository[SaleLine]):
         org_id: UUID,
         limit: int = 100,
         offset: int = 0,
-        user = Depends(require_user)
     ) -> List[SaleLine]:
         stmt = (
             select(SaleLine)

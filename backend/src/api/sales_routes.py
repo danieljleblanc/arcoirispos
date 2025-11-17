@@ -7,38 +7,51 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.database import get_session
-from src.core.security.dependencies import require_user, require_roles
-from src.schemas.pos_schemas import SaleCreate, SaleRead, SaleUpdate
-from src.services.pos.sales_service import sales_service
+from src.core.security.dependencies import (
+    require_any_staff,
+    require_admin,
+)
+from src.schemas.pos_schemas import (
+    SaleCreate,
+    SaleRead,
+    SaleReadWithLinesAndPayments,
+    SaleUpdate,
+)
+from src.services.pos.sales import sales_service
 
 router = APIRouter(prefix="/sales", tags=["sales"])
 
 
 # ---------------------------------------------------------
-# LIST SALES (authenticated user only)
+# LIST SALES (READ-ONLY, ANY STAFF IN ORG)
 # ---------------------------------------------------------
 @router.get("/", response_model=List[SaleRead])
 async def list_sales(
-    org_id: UUID,
+    org_id: UUID,                                     # REQUIRED for RBAC + filtering
     limit: int = 100,
     offset: int = 0,
     session: AsyncSession = Depends(get_session),
-    user=Depends(require_user),
+    user = Depends(require_any_staff),               # requires role in org_id
 ):
+    """
+    Returns a paginated list of sales for an org.
+    Archived sales are excluded at service layer.
+    """
     return await sales_service.get_by_org(session, org_id, limit, offset)
 
 
 # ---------------------------------------------------------
-# GET SINGLE SALE
+# GET A SINGLE SALE WITH LINES & PAYMENTS
 # ---------------------------------------------------------
-@router.get("/{sale_id}", response_model=SaleRead)
+@router.get("/{sale_id}", response_model=SaleReadWithLinesAndPayments)
 async def get_sale(
     sale_id: UUID,
+    org_id: UUID,                                     # RBAC check
     session: AsyncSession = Depends(get_session),
-    user=Depends(require_user),
+    user = Depends(require_any_staff),
 ):
     sale = await sales_service.get_with_relations(session, sale_id)
-    if not sale:
+    if not sale or sale.org_id != org_id:            # enforce org boundary
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Sale not found",
@@ -47,57 +60,70 @@ async def get_sale(
 
 
 # ---------------------------------------------------------
-# CREATE SALE (cashier/admin/owner)
+# CREATE SALE (CHECKOUT) — allow ANY STAFF (cashiers!)
 # ---------------------------------------------------------
-@router.post("/", response_model=SaleRead, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/",
+    response_model=SaleReadWithLinesAndPayments,
+    status_code=status.HTTP_201_CREATED,
+)
 async def create_sale(
     payload: SaleCreate,
     session: AsyncSession = Depends(get_session),
-    user=Depends(require_roles(["cashier", "admin", "owner"])),
+    user = Depends(require_any_staff),                # cashiers must be allowed
 ):
+    """
+    Creates a sale using the checkout engine.
+    """
     sale = await sales_service.create_sale(session, payload)
     return sale
 
 
 # ---------------------------------------------------------
-# UPDATE SALE (admin/owner)
+# UPDATE SALE (PATCH + RECALC) — admin/manager/owner only
 # ---------------------------------------------------------
-@router.patch("/{sale_id}", response_model=SaleRead)
+@router.patch(
+    "/{sale_id}",
+    response_model=SaleReadWithLinesAndPayments,
+)
 async def update_sale(
     sale_id: UUID,
     payload: SaleUpdate,
+    org_id: UUID,
     session: AsyncSession = Depends(get_session),
-    user=Depends(require_roles(["admin", "owner"])),
+    user = Depends(require_admin),
 ):
-    sale = await sales_service.get_with_relations(session, sale_id)
-    if not sale:
+    """
+    Updates a sale by merging the PATCH payload,
+    recalculating totals, and replacing lines/payments.
+    """
+    sale = await sales_service.update_sale(session, sale_id, payload)
+    if not sale or sale.org_id != org_id:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Sale not found",
+            detail="Sale not found or archived",
         )
-
-    # Apply updates
-    for field, value in payload.dict(exclude_unset=True).items():
-        setattr(sale, field, value)
-
-    await session.commit()
-    await session.refresh(sale)
     return sale
 
 
 # ---------------------------------------------------------
-# ARCHIVE (SOFT DELETE) SALE (admin/owner)
+# ARCHIVE SALE (SOFT DELETE)
 # ---------------------------------------------------------
-@router.delete("/{sale_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{sale_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
 async def archive_sale(
     sale_id: UUID,
+    org_id: UUID,
     session: AsyncSession = Depends(get_session),
-    user=Depends(require_roles(["admin", "owner"])),
+    user = Depends(require_admin),                   # admin/manager/owner
 ):
-    archived = await sales_service.archive_sale(session, sale_id)
-    if not archived:
+    sale = await sales_service.archive_sale(session, sale_id)
+    if not sale or sale.org_id != org_id:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Sale not found",
         )
+
     return None

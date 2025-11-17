@@ -8,7 +8,9 @@ from uuid import UUID
 from pydantic import BaseModel, EmailStr, Field
 
 
-# -------- Customers --------
+# ============================================================
+# CUSTOMERS
+# ============================================================
 
 class CustomerBase(BaseModel):
     org_id: UUID
@@ -45,7 +47,9 @@ class CustomerRead(CustomerBase):
         orm_mode = True
 
 
-# -------- Terminals --------
+# ============================================================
+# TERMINALS
+# ============================================================
 
 class TerminalBase(BaseModel):
     org_id: UUID
@@ -73,7 +77,9 @@ class TerminalRead(TerminalBase):
         orm_mode = True
 
 
-# -------- Tax Rates --------
+# ============================================================
+# TAX RATES
+# ============================================================
 
 class TaxRateBase(BaseModel):
     org_id: UUID
@@ -103,7 +109,9 @@ class TaxRateRead(TaxRateBase):
         orm_mode = True
 
 
-# -------- Sale Lines --------
+# ============================================================
+# SALE LINES
+# ============================================================
 
 class SaleLineBase(BaseModel):
     org_id: UUID
@@ -141,7 +149,9 @@ class SaleLineRead(SaleLineBase):
         orm_mode = True
 
 
-# -------- Payments --------
+# ============================================================
+# PAYMENTS
+# ============================================================
 
 class PaymentBase(BaseModel):
     org_id: UUID
@@ -154,6 +164,7 @@ class PaymentBase(BaseModel):
 
 class PaymentCreate(PaymentBase):
     sale_id: UUID
+
 
 class PaymentUpdate(BaseModel):
     payment_method: Optional[str] = None
@@ -172,7 +183,9 @@ class PaymentRead(PaymentBase):
         orm_mode = True
 
 
-# -------- Sales --------
+# ============================================================
+# SALES
+# ============================================================
 
 class SaleBase(BaseModel):
     org_id: UUID
@@ -197,10 +210,94 @@ class SaleCreate(SaleBase):
     payments: List[PaymentCreate] = []
 
 
+# ============================================================
+# SALE UPDATE (PATCH)
+# ============================================================
+
 class SaleUpdate(BaseModel):
+    # PATCH-able fields
+    terminal_id: Optional[UUID] = None
+    customer_id: Optional[UUID] = None
     status: Optional[str] = None
+    sale_type: Optional[str] = None
+    sale_date: Optional[datetime] = None
     notes: Optional[str] = None
 
+    # Optional children
+    lines: Optional[List[SaleLineCreate]] = None
+    payments: Optional[List[PaymentCreate]] = None
+
+    class Config:
+        from_attributes = True
+
+    # ---------------------------------------------------------
+    # Convert PATCH → full recalculation payload
+    # ---------------------------------------------------------
+    def to_recalculate_payload(self, existing_sale):
+        """
+        Takes the partial PATCH fields and merges them with the existing
+        sale to produce a full SaleCreate-like structure for use by
+        checkout_service.calculate().
+        """
+
+        # Merge top-level sale info
+        merged = {
+            "org_id": existing_sale.org_id,
+            "terminal_id": self.terminal_id or existing_sale.terminal_id,
+            "customer_id": self.customer_id or existing_sale.customer_id,
+            "sale_number": existing_sale.sale_number,   # Not overridden here
+            "status": self.status or existing_sale.status,
+            "sale_type": self.sale_type or existing_sale.sale_type,
+            "sale_date": self.sale_date or existing_sale.sale_date,
+            "notes": self.notes or existing_sale.notes,
+            "created_by": existing_sale.created_by,
+        }
+
+        # Merge sale lines
+        if self.lines is not None:
+            merged_lines = self.lines
+        else:
+            merged_lines = [
+                SaleLineCreate(
+                    item_id=line.item_id,
+                    line_number=line.line_number,
+                    description=line.description,
+                    quantity=line.quantity,
+                    unit_price=line.unit_price,
+                    discount_amount=line.discount_amount,
+                    tax_id=line.tax_id,
+                    tax_amount=line.tax_amount,
+                    line_total=line.line_total,
+                )
+                for line in existing_sale.sale_lines
+            ]
+
+        # Merge payments
+        if self.payments is not None:
+            merged_payments = self.payments
+        else:
+            merged_payments = [
+                PaymentCreate(
+                    org_id=payment.org_id,
+                    payment_method=payment.payment_method,
+                    amount=payment.amount,
+                    currency=payment.currency,
+                    external_ref=payment.external_ref,
+                    processed_at=payment.processed_at,
+                    sale_id=existing_sale.sale_id,
+                )
+                for payment in existing_sale.payments
+            ]
+
+        merged["lines"] = merged_lines
+        merged["payments"] = merged_payments
+
+        return SaleCreate(**merged)
+
+
+# ============================================================
+# SALE READ MODELS
+# ============================================================
 
 class SaleRead(SaleBase):
     sale_id: UUID

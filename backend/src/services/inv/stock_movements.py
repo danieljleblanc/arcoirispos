@@ -1,3 +1,5 @@
+# backend/src/services/inv/stock_movements.py
+
 from typing import List, Optional
 from uuid import UUID
 
@@ -22,7 +24,7 @@ class StockMovementService(BaseRepository[StockMovement]):
         stmt = (
             select(StockMovement)
             .where(StockMovement.org_id == org_id)
-            .order_by(StockMovement.occurred_at.desc())
+            .order_by(StockMovement.occurred_at.desc())  # newest first = correct
             .limit(limit)
             .offset(offset)
         )
@@ -35,7 +37,7 @@ class StockMovementService(BaseRepository[StockMovement]):
         movement_id: UUID,
     ) -> Optional[StockMovement]:
         stmt = select(StockMovement).where(
-            StockMovement.movement_id == movement_id
+            StockMovement.movement_id == movement_id,
         )
         result = await session.execute(stmt)
         return result.scalar_one_or_none()

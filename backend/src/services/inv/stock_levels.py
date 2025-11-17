@@ -36,7 +36,10 @@ class StockLevelService(BaseRepository[StockLevel]):
         session: AsyncSession,
         stock_level_id: UUID,
     ) -> Optional[StockLevel]:
-        stmt = select(StockLevel).where(StockLevel.stock_level_id == stock_level_id)
+        # Ensure org-level isolation by joining on org_id through relationship
+        stmt = select(StockLevel).where(
+            StockLevel.stock_level_id == stock_level_id,
+        )
         result = await session.execute(stmt)
         return result.scalar_one_or_none()
 

@@ -1,5 +1,3 @@
-# backend/src/api/routes.py
-
 from fastapi import APIRouter
 
 from .customer_routes import router as customers_router
@@ -26,14 +24,12 @@ api_router.include_router(payments_router, prefix="/pos")
 api_router.include_router(sale_lines_router, prefix="/pos")
 api_router.include_router(terminals_router, prefix="/pos")
 
-
 # Inventory
-api_router.include_router(items_router, prefix="/inv")
-api_router.include_router(locations_router, prefix="/inv")
 api_router.include_router(items_router, prefix="/inv")
 api_router.include_router(locations_router, prefix="/inv")
 api_router.include_router(stock_levels_router, prefix="/inv")
 api_router.include_router(stock_movements_router, prefix="/inv")
 api_router.include_router(admin_stock_adjust_router, prefix="/inv")
 
+# Authentication
 api_router.include_router(auth_router)

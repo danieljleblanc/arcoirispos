@@ -25,7 +25,7 @@ class LocationService(BaseRepository[Location]):
             select(Location)
             .where(
                 Location.org_id == org_id,
-                Location.deleted_at.is_(None),      # soft delete filter
+                Location.deleted_at.is_(None),   # soft delete filter
             )
             .order_by(Location.name.asc())
             .limit(limit)
@@ -43,7 +43,7 @@ class LocationService(BaseRepository[Location]):
             select(Location)
             .where(
                 Location.location_id == location_id,
-                Location.deleted_at.is_(None),      # soft delete filter
+                Location.deleted_at.is_(None),   # soft delete filter
             )
         )
         result = await session.execute(stmt)
@@ -55,7 +55,7 @@ class LocationService(BaseRepository[Location]):
         location_id: UUID,
     ) -> Optional[Location]:
         """
-        Soft delete using BaseRepository logic.
+        Soft-delete using BaseRepository logic.
         """
         return await self.delete(session, location_id)
 

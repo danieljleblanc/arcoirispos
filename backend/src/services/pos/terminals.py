@@ -18,12 +18,11 @@ class TerminalService(BaseRepository[Terminal]):
         org_id: UUID,
         limit: int = 100,
         offset: int = 0,
-        user = Depends(require_user)
     ) -> List[Terminal]:
         stmt = (
             select(Terminal)
             .where(Terminal.org_id == org_id)
-            .order_by(Terminal.name.asc())
+            .order_by(Terminal.created_at.desc())
             .limit(limit)
             .offset(offset)
         )
@@ -34,7 +33,6 @@ class TerminalService(BaseRepository[Terminal]):
         self,
         session: AsyncSession,
         terminal_id: UUID,
-        user = Depends(require_user)
     ) -> Optional[Terminal]:
         stmt = select(Terminal).where(Terminal.terminal_id == terminal_id)
         result = await session.execute(stmt)
