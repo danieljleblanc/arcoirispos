@@ -12,6 +12,7 @@ from .sale_lines_routes import router as sale_lines_router
 from .terminals_routes import router as terminals_router
 from .admin_stock_adjust_routes import router as admin_stock_adjust_router
 from .auth_routes import router as auth_router
+from .dev_bootstrap_routes import router as dev_bootstrap_router
 
 
 api_router = APIRouter()
@@ -33,3 +34,4 @@ api_router.include_router(admin_stock_adjust_router, prefix="/inv")
 
 # Authentication
 api_router.include_router(auth_router)
+api_router.include_router(dev_bootstrap_router)
