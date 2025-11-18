@@ -4,7 +4,7 @@ from sqlalchemy import create_engine, pool
 from alembic import context
 
 # Import your models Base and settings
-from src.models.models import Base
+from src.models import Base
 from src.core.config import settings
 
 config = context.config
@@ -60,7 +60,7 @@ def run_migrations_offline() -> None:
         process_revision_directives=process_revision_directives,
         dialect_opts={"paramstyle": "named"},
         include_schemas=True,
-        version_table_schema="core",
+        version_table_schema=None,
     )
 
     with context.begin_transaction():
@@ -82,7 +82,7 @@ def run_migrations_online() -> None:
             compare_server_default=False,
             include_object=include_object,
             include_schemas=True,
-            version_table_schema="core",
+            version_table_schema=None,
             render_as_batch=True,
             process_revision_directives=process_revision_directives,
         )

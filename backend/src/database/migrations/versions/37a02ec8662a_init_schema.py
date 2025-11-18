@@ -235,7 +235,18 @@ def upgrade() -> None:
         sa.Column("org_id", sa.UUID(), nullable=False),
         sa.Column("line_number", sa.Integer(), nullable=False),
         sa.Column("account_id", sa.UUID(), nullable=False),
-        sa.Column("entry_type", postgresql.ENUM("debit", "credit", name="acct_entry_type"), nullable=False),
+        sa.Column(
+    "entry_type",
+    postgresql.ENUM(
+        "debit",
+        "credit",
+        name="acct_entry_type",
+        schema="acct",
+        create_type=False,
+    ),
+    nullable=False,
+),
+
         sa.Column("amount", sa.Numeric(precision=18, scale=4), nullable=False),
         sa.Column("memo", sa.Text(), nullable=True),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("NOW()"), nullable=False),
