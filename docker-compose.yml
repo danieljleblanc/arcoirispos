@@ -13,8 +13,6 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      # Absolute path with correct case so Docker Desktop can mount it
-      - /Volumes/dev/repos/arcoirispos/backend/database/migrations:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U arcoiris_user -d arcoirispos_dev"]
       interval: 5s

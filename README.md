@@ -160,3 +160,176 @@ Foreside Holdings LLC
 Architect • Developer • Designer  
 FastAPI • PostgreSQL • React • Systems Engineering
 
+# **ArcoirisPOS Database Migration Graph & Documentation**
+
+This document provides a **complete overview** of the Alembic migration sequence for the ArcoirisPOS backend. It includes a visual graph of the migration chain, detailed descriptions of each revision, and rules for maintaining the migration integrity going forward.
+
+---
+
+## **📌 Purpose of This Document**
+
+* Establish the *canonical* migration order
+* Prevent out-of-sequence migrations
+* Document how the baseline collapse works
+* Help future developers understand which migrations create schemas, tables, test stubs, and seed data
+* Provide a safe workflow for adding new migrations
+
+---
+
+# **📈 Migration Graph (ASCII / Markdown Visual)**
+
+```text
+                       ┌──────────────────────────────┐
+                       │        BASELINE START         │
+                       │      (no revision present)    │
+                       └───────────────┬───────────────┘
+                                       │
+                                       ▼
+                         ┌────────────────────────────┐
+                         │ 000000000001                │
+                         │ Full Schema Baseline        │
+                         │ baseline_schema_collapse.py │
+                         └───────────────┬────────────┘
+                                         │
+                                         ▼
+                         ┌────────────────────────────┐
+                         │ 37a02ec8662a                │
+                         │ Init Schema                 │
+                         │ init_schema.py              │
+                         └───────────────┬────────────┘
+                                         │
+                                         ▼
+                         ┌────────────────────────────┐
+                         │ 853113448960               │
+                         │ Template Sanity Test       │
+                         │ template_sanity_test.py    │
+                         └───────────────┬────────────┘
+                                         │
+                                         ▼
+                         ┌────────────────────────────┐
+                         │ 2864583ca021               │
+                         │ Seed Initial Data          │
+                         │ seed_initial_data.py       │
+                         └────────────────────────────┘
+```
+
+---
+
+# **📄 Migration Revision Index**
+
+| Order | Revision ID    | File Name                     | Description                                                            |
+| ----: | -------------- | ----------------------------- | ---------------------------------------------------------------------- |
+|     0 | *BASE*         | *no file*                     | Empty state before first migration                                     |
+|     1 | `000000000001` | `baseline_schema_collapse.py` | Creates schemas & extensions only. This is the new canonical baseline. |
+|     2 | `37a02ec8662a` | `init_schema.py`              | Full table & enum creation (core, acct, inv, pos).                     |
+|     3 | `853113448960` | `template_sanity_test.py`     | No-op template migration (kept for history).                           |
+|     4 | `2864583ca021` | `seed_initial_data.py`        | Inserts initial org/user/role/etc.                                     |
+
+---
+
+# **📌 Baseline Migration Behavior**
+
+### The file `000000000001_baseline_schema_collapse.py`:
+
+* **MUST remain minimal**
+  ✔ Creates schemas
+  ✔ Creates required extensions (`citext`, `pgcrypto`)
+  ✘ **No tables**
+  ✘ **No enums**
+  ✘ **No foreign keys**
+  ✘ **No sequences or seed data**
+
+This ensures Alembic can:
+
+* downgrade safely to baseline
+* rebase future schemas
+* allow clean rebuilds without reinitializing table content
+
+---
+
+# **🚀 Commands to Work With the Migration Graph**
+
+### **Upgrade to latest**
+
+```bash
+alembic upgrade head
+```
+
+### **Downgrade to baseline**
+
+```bash
+alembic downgrade 000000000001
+```
+
+### **Downgrade ALL the way (dangerous)**
+
+```bash
+alembic downgrade base
+```
+
+### **Show the migration tree**
+
+```bash
+alembic history --verbose
+```
+
+---
+
+# **📐 Rules for Future Migrations**
+
+To keep the system stable:
+
+### ✔ DO:
+
+* Create new migrations using:
+
+  ```bash
+  alembic revision -m "description"
+  ```
+* Keep baseline **untouched forever**
+* Place all schema changes in migrations **after** `37a02ec8662a`
+* Ensure each migration:
+
+  * is reversible
+  * does not duplicate prior schema objects
+  * maintains referential integrity
+
+### ✘ DO NOT:
+
+* Modify old migration files
+* Add tables or types to the baseline
+* Change revision IDs
+* Change down_revision links retroactively
+* Manually alter database schema outside Alembic
+
+---
+
+# **⚠️ Developer Warnings (Critical)**
+
+### **1. Never rebuild the baseline again.**
+
+This is a one-time operation.
+The new canonical base is now `000000000001`.
+
+### **2. Do not reorder migration history.**
+
+Alembic depends on a strict DAG.
+
+### **3. All future schema work MUST start after `37a02ec8662a`.**
+
+### **4. If autogenerate ever outputs an empty migration:**
+
+It should be automatically discarded (your env.py handles this).
+
+### **5. If a migration fails during CI or local build:**
+
+Run:
+
+```bash
+docker-compose down -v
+docker-compose up -d
+alembic upgrade head
+```
+
+
+

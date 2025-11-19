@@ -1,8 +1,9 @@
-"""baseline schema collapse
+"""
+Full schema baseline collapse
 
 Revision ID: 000000000001
 Revises:
-Create Date: 2025-11-18 (reset baseline)
+Create Date: 2025-11-18
 """
 
 from typing import Sequence, Union
@@ -15,7 +16,7 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    # Only schemas and extensions belong in the baseline
+    # Only schemas + extensions belong in the baseline
     op.execute("CREATE SCHEMA IF NOT EXISTS core")
     op.execute("CREATE SCHEMA IF NOT EXISTS acct")
     op.execute("CREATE SCHEMA IF NOT EXISTS inv")
@@ -26,7 +27,6 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    # Reverse of the baseline — clean and minimal
     op.execute("DROP SCHEMA IF EXISTS pos CASCADE")
     op.execute("DROP SCHEMA IF EXISTS inv CASCADE")
     op.execute("DROP SCHEMA IF EXISTS acct CASCADE")

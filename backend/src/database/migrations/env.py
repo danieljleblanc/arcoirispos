@@ -3,30 +3,39 @@ from logging.config import fileConfig
 from sqlalchemy import create_engine, pool
 from alembic import context
 
-# Import your models Base and settings
+# --- Import application's Base and config ---
 from src.models import Base
 from src.core.config import settings
 
+# Alembic Config object
 config = context.config
 
 # Logging
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# Target metadata
+# Metadata used by autogenerate
 target_metadata = Base.metadata
 
 
 # ---------------------------------------------------------
-# ALEMBIC AUTOGENERATE FILTERS
+# AUTOGENERATE FILTERS & SAFETY
 # ---------------------------------------------------------
 
 def include_object(object, name, type_, reflected, compare_to):
-    # Ignore ONLY the core accidental version table (just in case)
-    if type_ == "table" and getattr(object, "schema", None) == "core" and name == "alembic_version":
+    """
+    Control what objects Alembic “sees”.
+    We keep everything EXCEPT:
+    - accidental migrations table inside a custom schema
+    """
+    if (
+        type_ == "table"
+        and getattr(object, "schema", None) in {"core", "acct", "inv", "pos"}
+        and name == "alembic_version"
+    ):
+        # Ensure no schema-pinned version table is processed
         return False
 
-    # Accept everything else
     return True
 
 
@@ -43,23 +52,23 @@ def process_revision_directives(context, revision, directives):
 
 
 # ---------------------------------------------------------
-# MIGRATION MODES
+# OFFLINE MODE
 # ---------------------------------------------------------
 
 def run_migrations_offline() -> None:
-    """Run migrations without DB connection."""
+    """Run migrations without a live DB connection."""
     url = config.get_main_option("sqlalchemy.url")
 
     context.configure(
         url=url,
         target_metadata=target_metadata,
-        literal_binds=True,
         include_object=include_object,
+        include_schemas=True,
         compare_type=True,
         compare_server_default=False,
         process_revision_directives=process_revision_directives,
+        literal_binds=True,
         dialect_opts={"paramstyle": "named"},
-        include_schemas=True,
         version_table_schema=None,
     )
 
@@ -67,8 +76,13 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 
+# ---------------------------------------------------------
+# ONLINE MODE
+# ---------------------------------------------------------
+
 def run_migrations_online() -> None:
-    """Run migrations with live DB connection."""
+    """Run migrations with a live database connection."""
+
     engine = create_engine(
         settings.database_url,
         poolclass=pool.NullPool,
@@ -78,13 +92,13 @@ def run_migrations_online() -> None:
         context.configure(
             connection=connection,
             target_metadata=target_metadata,
-            compare_type=True,
-            compare_server_default=False,
             include_object=include_object,
             include_schemas=True,
-            version_table_schema=None,
-            render_as_batch=True,
+            compare_type=True,
+            compare_server_default=False,
             process_revision_directives=process_revision_directives,
+            render_as_batch=False,
+            version_table_schema=None,  # version table lives in default schema
         )
 
         with context.begin_transaction():
