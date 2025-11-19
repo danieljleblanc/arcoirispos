@@ -4,5 +4,6 @@ acct_entry_type_enum = postgresql.ENUM(
     "debit",
     "credit",
     name="acct_entry_type",
-    create_type=False,  # DB type is created via migrations
+    schema="acct",
+    create_type=False,  # keep this because the init migration creates it
 )
