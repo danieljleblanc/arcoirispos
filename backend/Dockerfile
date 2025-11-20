@@ -21,6 +21,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the entire backend source code
 COPY src ./src
 
+# 🔥 ADD THIS LINE — VERY IMPORTANT
+COPY .env .env
+
 EXPOSE 8000
 
 # Final CMD (only ONE allowed)

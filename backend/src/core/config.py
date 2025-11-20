@@ -1,15 +1,21 @@
+# backend/src/core/config.py
+
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
-    # Sync DB URL (used by Alembic and any sync engine)
+    # Sync DB URL
     database_url: str = (
         "postgresql://arcoiris_user:ArcoirisDevP%40ss2025@localhost:5432/arcoirispos_dev"
     )
 
-    # Async DB URL (used by SQLAlchemy async engine + asyncpg)
+    # Async DB URL
     database_url_async: str = (
         "postgresql+asyncpg://arcoiris_user:ArcoirisDevP%40ss2025@localhost:5432/arcoirispos_dev"
     )
+
+    # 🔥 ADD THIS FIELD
+    secret_key: str
+    dev_admin_secret: str | None = None
 
     @property
     def DATABASE_URL(self) -> str:
@@ -19,5 +25,5 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
 
-
 settings = Settings()
+

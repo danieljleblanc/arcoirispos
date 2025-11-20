@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.database import get_session
-from src.models.models import UserOrgRole
+from src.models.core.role_models import UserOrgRole
 from src.core.security.roles import Role
 from src.core.security.auth import get_current_user
 
