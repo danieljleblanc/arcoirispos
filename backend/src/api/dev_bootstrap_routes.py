@@ -1,10 +1,8 @@
-# backend/src/api/dev_bootstrap_routes.py
-
 from fastapi import APIRouter, Depends, status, Header, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from uuid import uuid4
-from datetime import datetime
+from datetime import datetime, timezone
 
 from src.core.database import get_session
 from src.models.core.user_models import User
@@ -13,24 +11,28 @@ from src.models.core.role_models import UserOrgRole
 from src.core.security.hashing import hash_password
 from src.core.config import settings
 
+
 router = APIRouter(prefix="/dev", tags=["dev-tools"])
 
 
 # ---------------------------------------------------------
-# SECURITY: lock dev-only routes behind a secret
+# SECURITY: lock dev-only routes behind a secret header
 # ---------------------------------------------------------
 async def verify_dev_secret(x_dev_secret: str = Header(None)):
     """
     Protects dev-only routes using a secret from .env.
     Requires header:  X-DEV-SECRET: <value>
     """
-    if settings.dev_admin_secret is None:
+
+    expected = settings.dev_admin_secret
+
+    if expected is None or expected.strip() == "":
         raise HTTPException(
             status_code=500,
             detail="DEV_ADMIN_SECRET not configured",
         )
 
-    if x_dev_secret != settings.dev_admin_secret:
+    if x_dev_secret != expected:
         raise HTTPException(
             status_code=403,
             detail="Forbidden: invalid dev secret",
@@ -54,6 +56,7 @@ async def create_admin_user(
     """
 
     admin_email = "admin@example.com"
+    now = datetime.now(timezone.utc)
 
     # -----------------------------
     # 1. Ensure at least one org exists
@@ -62,7 +65,6 @@ async def create_admin_user(
     org = org_result.scalar_one_or_none()
 
     if not org:
-        # Create a simple dev org
         org = Organization(
             org_id=uuid4(),
             name="Dev Organization",
@@ -70,8 +72,8 @@ async def create_admin_user(
             timezone="UTC",
             base_currency="USD",
             is_active=True,
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
+            created_at=now,
+            updated_at=now,
         )
         session.add(org)
         await session.flush()
@@ -99,8 +101,8 @@ async def create_admin_user(
         display_name="Dev Admin",
         password_hash=hash_password("password123"),
         is_active=True,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow(),
+        created_at=now,
+        updated_at=now,
     )
 
     session.add(admin)
@@ -115,11 +117,10 @@ async def create_admin_user(
         org_id=org.org_id,
         role="owner",
         is_primary=True,
-        created_at=datetime.utcnow(),
+        created_at=now,
     )
 
     session.add(owner_role)
-
     await session.commit()
     await session.refresh(admin)
 

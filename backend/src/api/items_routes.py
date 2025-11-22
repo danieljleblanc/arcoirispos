@@ -23,7 +23,7 @@ async def list_items(
     limit: int = 100,
     offset: int = 0,
     session: AsyncSession = Depends(get_session),
-    user = Depends(require_any_staff),
+    user=Depends(require_any_staff),
 ):
     return await item_service.get_by_org(session, org_id, limit, offset)
 
@@ -34,12 +34,13 @@ async def list_items(
 @router.get("/{item_id}", response_model=ItemRead)
 async def get_item(
     item_id: UUID,
+    org_id: UUID,
     session: AsyncSession = Depends(get_session),
-    user = Depends(require_any_staff),
+    user=Depends(require_any_staff),
 ):
     item = await item_service.get_by_id(session, item_id)
 
-    if not item:
+    if not item or item.org_id != org_id:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Item not found",
@@ -53,11 +54,15 @@ async def get_item(
 # ---------------------------------------------------------
 @router.post("/", response_model=ItemRead, status_code=status.HTTP_201_CREATED)
 async def create_item(
+    org_id: UUID,
     payload: ItemCreate,
     session: AsyncSession = Depends(get_session),
-    user = Depends(require_admin),
+    user=Depends(require_admin),
 ):
-    item = await item_service.create(session, payload.dict())
+    data = payload.dict()
+    data["org_id"] = org_id
+
+    item = await item_service.create(session, data)
     await session.commit()
     await session.refresh(item)
     return item
@@ -69,18 +74,18 @@ async def create_item(
 @router.patch("/{item_id}", response_model=ItemRead)
 async def update_item(
     item_id: UUID,
+    org_id: UUID,
     payload: ItemUpdate,
     session: AsyncSession = Depends(get_session),
-    user = Depends(require_admin),
+    user=Depends(require_admin),
 ):
     item = await item_service.get_by_id(session, item_id)
-    if not item:
+    if not item or item.org_id != org_id:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Item not found",
         )
 
-    # Apply only fields included in PATCH payload
     update_fields = payload.dict(exclude_unset=True)
     for field, value in update_fields.items():
         setattr(item, field, value)
@@ -96,22 +101,21 @@ async def update_item(
 @router.delete("/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_item(
     item_id: UUID,
+    org_id: UUID,
     session: AsyncSession = Depends(get_session),
-    user = Depends(require_admin),
+    user=Depends(require_admin),
 ):
-    # Validate item exists before deletion
     item = await item_service.get_by_id(session, item_id)
-    if not item:
+    if not item or item.org_id != org_id:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Item not found",
         )
 
     deleted = await item_service.delete_item(session, item_id)
-
     if not deleted:
         raise HTTPException(
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="Item not found or could not be deleted",
         )
 

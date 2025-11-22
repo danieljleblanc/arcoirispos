@@ -28,7 +28,7 @@ async def list_terminals(
     limit: int = 100,
     offset: int = 0,
     session: AsyncSession = Depends(get_session),
-    user = Depends(require_any_staff),
+    user=Depends(require_any_staff),
 ):
     return await terminal_service.get_by_org(session, org_id, limit, offset)
 
@@ -41,7 +41,7 @@ async def get_terminal(
     terminal_id: UUID,
     org_id: UUID,
     session: AsyncSession = Depends(get_session),
-    user = Depends(require_any_staff),
+    user=Depends(require_any_staff),
 ):
     terminal = await terminal_service.get_by_id(session, terminal_id)
 
@@ -59,11 +59,15 @@ async def get_terminal(
 # ---------------------------------------------------------
 @router.post("/", response_model=TerminalRead, status_code=status.HTTP_201_CREATED)
 async def create_terminal(
+    org_id: UUID,
     payload: TerminalCreate,
     session: AsyncSession = Depends(get_session),
-    user = Depends(require_admin),
+    user=Depends(require_admin),
 ):
-    terminal = await terminal_service.create(session, payload.dict())
+    data = payload.dict()
+    data["org_id"] = org_id
+
+    terminal = await terminal_service.create(session, data)
     await session.commit()
     await session.refresh(terminal)
     return terminal
@@ -75,10 +79,10 @@ async def create_terminal(
 @router.patch("/{terminal_id}", response_model=TerminalRead)
 async def update_terminal(
     terminal_id: UUID,
-    payload: TerminalUpdate,
     org_id: UUID,
+    payload: TerminalUpdate,
     session: AsyncSession = Depends(get_session),
-    user = Depends(require_admin),
+    user=Depends(require_admin),
 ):
     terminal = await terminal_service.get_by_id(session, terminal_id)
 
@@ -104,7 +108,7 @@ async def delete_terminal(
     terminal_id: UUID,
     org_id: UUID,
     session: AsyncSession = Depends(get_session),
-    user = Depends(require_admin),
+    user=Depends(require_admin),
 ):
     terminal = await terminal_service.get_by_id(session, terminal_id)
 

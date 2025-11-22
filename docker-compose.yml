@@ -34,6 +34,8 @@ services:
       DATABASE_URL: "postgresql://arcoiris_user:ArcoirisDevP%40ss2025@postgres:5432/arcoirispos_dev"
     ports:
       - "8000:8000"
+    volumes:
+      - ./backend:/app
     command: >
       bash -c "python src/wait_for_db.py &&
       uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"

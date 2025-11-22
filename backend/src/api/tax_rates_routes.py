@@ -28,7 +28,7 @@ async def list_tax_rates(
     limit: int = 100,
     offset: int = 0,
     session: AsyncSession = Depends(get_session),
-    user = Depends(require_any_staff),
+    user=Depends(require_any_staff),
 ):
     return await tax_rate_service.get_by_org(session, org_id, limit, offset)
 
@@ -41,7 +41,7 @@ async def get_tax_rate(
     tax_id: UUID,
     org_id: UUID,
     session: AsyncSession = Depends(get_session),
-    user = Depends(require_any_staff),
+    user=Depends(require_any_staff),
 ):
     tax_rate = await tax_rate_service.get_by_id(session, tax_id)
 
@@ -59,11 +59,15 @@ async def get_tax_rate(
 # ---------------------------------------------------------
 @router.post("/", response_model=TaxRateRead, status_code=status.HTTP_201_CREATED)
 async def create_tax_rate(
+    org_id: UUID,
     payload: TaxRateCreate,
     session: AsyncSession = Depends(get_session),
-    user = Depends(require_admin),
+    user=Depends(require_admin),
 ):
-    tax_rate = await tax_rate_service.create(session, payload.dict())
+    data = payload.dict()
+    data["org_id"] = org_id
+
+    tax_rate = await tax_rate_service.create(session, data)
     await session.commit()
     await session.refresh(tax_rate)
     return tax_rate
@@ -75,10 +79,10 @@ async def create_tax_rate(
 @router.patch("/{tax_id}", response_model=TaxRateRead)
 async def update_tax_rate(
     tax_id: UUID,
-    payload: TaxRateUpdate,
     org_id: UUID,
+    payload: TaxRateUpdate,
     session: AsyncSession = Depends(get_session),
-    user = Depends(require_admin),
+    user=Depends(require_admin),
 ):
     tax_rate = await tax_rate_service.get_by_id(session, tax_id)
 
@@ -104,7 +108,7 @@ async def delete_tax_rate(
     tax_id: UUID,
     org_id: UUID,
     session: AsyncSession = Depends(get_session),
-    user = Depends(require_admin),
+    user=Depends(require_admin),
 ):
     tax_rate = await tax_rate_service.get_by_id(session, tax_id)
 

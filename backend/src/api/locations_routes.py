@@ -27,7 +27,7 @@ async def list_locations(
     limit: int = 100,
     offset: int = 0,
     session: AsyncSession = Depends(get_session),
-    user = Depends(require_any_staff),
+    user=Depends(require_any_staff),
 ):
     return await location_service.get_by_org(session, org_id, limit, offset)
 
@@ -38,12 +38,13 @@ async def list_locations(
 @router.get("/{location_id}", response_model=LocationRead)
 async def get_location(
     location_id: UUID,
+    org_id: UUID,
     session: AsyncSession = Depends(get_session),
-    user = Depends(require_any_staff),
+    user=Depends(require_any_staff),
 ):
     location = await location_service.get_by_id(session, location_id)
 
-    if not location:
+    if not location or location.org_id != org_id:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Location not found",
@@ -57,11 +58,15 @@ async def get_location(
 # ---------------------------------------------------------
 @router.post("/", response_model=LocationRead, status_code=status.HTTP_201_CREATED)
 async def create_location(
+    org_id: UUID,
     payload: LocationCreate,
     session: AsyncSession = Depends(get_session),
-    user = Depends(require_admin),
+    user=Depends(require_admin),
 ):
-    location = await location_service.create(session, payload.dict())
+    data = payload.dict()
+    data["org_id"] = org_id
+
+    location = await location_service.create(session, data)
     await session.commit()
     await session.refresh(location)
     return location
@@ -73,12 +78,13 @@ async def create_location(
 @router.patch("/{location_id}", response_model=LocationRead)
 async def update_location(
     location_id: UUID,
+    org_id: UUID,
     payload: LocationUpdate,
     session: AsyncSession = Depends(get_session),
-    user = Depends(require_admin),
+    user=Depends(require_admin),
 ):
     location = await location_service.get_by_id(session, location_id)
-    if not location:
+    if not location or location.org_id != org_id:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Location not found",
@@ -99,11 +105,12 @@ async def update_location(
 @router.delete("/{location_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_location(
     location_id: UUID,
+    org_id: UUID,
     session: AsyncSession = Depends(get_session),
-    user = Depends(require_admin),
+    user=Depends(require_admin),
 ):
     location = await location_service.get_by_id(session, location_id)
-    if not location:
+    if not location or location.org_id != org_id:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Location not found",

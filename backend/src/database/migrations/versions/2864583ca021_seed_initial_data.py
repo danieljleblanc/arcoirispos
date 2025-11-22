@@ -19,7 +19,6 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    # UUIDs
     org_id = str(uuid4())
     admin_user_id = str(uuid4())
     now = datetime.utcnow()
@@ -101,9 +100,7 @@ def upgrade() -> None:
     # Insert: admin user
     # ------------------------------
 
-    admin_password_hash = (
-        "$2b$12$Lysf8r2raXIiQunlslqYIuqfmQWf9e7N1TWGh1ZHFqRSbVSSMzdg2"
-    )
+    admin_password_hash = "$2b$12$Vnp0Po7yFgty6yfUQFpD5O6sf5ZCZiequD2GM1l4IQhmgbB7iaG.6"
 
     op.bulk_insert(
         users,

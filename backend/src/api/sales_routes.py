@@ -27,11 +27,11 @@ router = APIRouter(prefix="/sales", tags=["sales"])
 # ---------------------------------------------------------
 @router.get("/", response_model=List[SaleRead])
 async def list_sales(
-    org_id: UUID,                                     # REQUIRED for RBAC + filtering
+    org_id: UUID,
     limit: int = 100,
     offset: int = 0,
     session: AsyncSession = Depends(get_session),
-    user = Depends(require_any_staff),               # requires role in org_id
+    user=Depends(require_any_staff),
 ):
     """
     Returns a paginated list of sales for an org.
@@ -46,12 +46,12 @@ async def list_sales(
 @router.get("/{sale_id}", response_model=SaleReadWithLinesAndPayments)
 async def get_sale(
     sale_id: UUID,
-    org_id: UUID,                                     # RBAC check
+    org_id: UUID,
     session: AsyncSession = Depends(get_session),
-    user = Depends(require_any_staff),
+    user=Depends(require_any_staff),
 ):
     sale = await sales_service.get_with_relations(session, sale_id)
-    if not sale or sale.org_id != org_id:            # enforce org boundary
+    if not sale or sale.org_id != org_id:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Sale not found",
@@ -68,13 +68,24 @@ async def get_sale(
     status_code=status.HTTP_201_CREATED,
 )
 async def create_sale(
+    org_id: UUID,
     payload: SaleCreate,
     session: AsyncSession = Depends(get_session),
-    user = Depends(require_any_staff),                # cashiers must be allowed
+    user=Depends(require_any_staff),
 ):
     """
     Creates a sale using the checkout engine.
+
+    NOTE: For safety, we can optionally enforce that the incoming payload's
+    org_id (if present) matches the org_id query param.
     """
+    # Defensive check if SaleCreate includes org_id
+    if hasattr(payload, "org_id") and payload.org_id != org_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Payload org_id does not match request org_id",
+        )
+
     sale = await sales_service.create_sale(session, payload)
     return sale
 
@@ -88,10 +99,10 @@ async def create_sale(
 )
 async def update_sale(
     sale_id: UUID,
-    payload: SaleUpdate,
     org_id: UUID,
+    payload: SaleUpdate,
     session: AsyncSession = Depends(get_session),
-    user = Depends(require_admin),
+    user=Depends(require_admin),
 ):
     """
     Updates a sale by merging the PATCH payload,
@@ -117,7 +128,7 @@ async def archive_sale(
     sale_id: UUID,
     org_id: UUID,
     session: AsyncSession = Depends(get_session),
-    user = Depends(require_admin),                   # admin/manager/owner
+    user=Depends(require_admin),
 ):
     sale = await sales_service.archive_sale(session, sale_id)
     if not sale or sale.org_id != org_id:

@@ -27,7 +27,7 @@ async def list_stock_movements(
     limit: int = 100,
     offset: int = 0,
     session: AsyncSession = Depends(get_session),
-    user = Depends(require_any_staff),
+    user=Depends(require_any_staff),
 ):
     return await stock_movement_service.get_by_org(session, org_id, limit, offset)
 
@@ -40,7 +40,7 @@ async def get_stock_movement(
     movement_id: UUID,
     org_id: UUID,
     session: AsyncSession = Depends(get_session),
-    user = Depends(require_any_staff),
+    user=Depends(require_any_staff),
 ):
     movement = await stock_movement_service.get_by_id(session, movement_id)
 
@@ -58,11 +58,15 @@ async def get_stock_movement(
 # ---------------------------------------------------------
 @router.post("/", response_model=StockMovementRead, status_code=status.HTTP_201_CREATED)
 async def create_stock_movement(
+    org_id: UUID,
     payload: StockMovementCreate,
     session: AsyncSession = Depends(get_session),
-    user = Depends(require_admin),    # 🔒 was any_staff — fixed
+    user=Depends(require_admin),
 ):
-    movement = await stock_movement_service.create(session, payload.dict())
+    data = payload.dict()
+    data["org_id"] = org_id
+
+    movement = await stock_movement_service.create(session, data)
     await session.commit()
     await session.refresh(movement)
     return movement

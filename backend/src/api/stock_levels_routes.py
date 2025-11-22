@@ -3,7 +3,7 @@
 from typing import List
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.database import get_session
@@ -14,7 +14,6 @@ from src.schemas.inv_schemas import (
 )
 from src.services.inv.stock_levels import stock_level_service
 from src.core.security.dependencies import require_any_staff, require_admin
-
 
 router = APIRouter(prefix="/stock-levels", tags=["stock-levels"])
 
@@ -28,7 +27,7 @@ async def list_stock_levels(
     limit: int = 100,
     offset: int = 0,
     session: AsyncSession = Depends(get_session),
-    user = Depends(require_any_staff),    # 🔒 any staff
+    user=Depends(require_any_staff),
 ):
     return await stock_level_service.get_by_org(session, org_id, limit, offset)
 
@@ -41,13 +40,13 @@ async def get_stock_level(
     stock_level_id: UUID,
     org_id: UUID,
     session: AsyncSession = Depends(get_session),
-    user = Depends(require_any_staff),    # 🔒 any staff
+    user=Depends(require_any_staff),
 ):
     stock_level = await stock_level_service.get_by_id(session, stock_level_id)
 
     if not stock_level or stock_level.org_id != org_id:
         raise HTTPException(
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="Stock level not found",
         )
 
@@ -57,13 +56,17 @@ async def get_stock_level(
 # ---------------------------------------------------------
 # CREATE STOCK LEVEL (admin / manager / owner)
 # ---------------------------------------------------------
-@router.post("/", response_model=StockLevelRead, status_code=201)
+@router.post("/", response_model=StockLevelRead, status_code=status.HTTP_201_CREATED)
 async def create_stock_level(
+    org_id: UUID,
     payload: StockLevelCreate,
     session: AsyncSession = Depends(get_session),
-    user = Depends(require_admin),        # 🔒 admin/manager/owner
+    user=Depends(require_admin),
 ):
-    stock_level = await stock_level_service.create(session, payload.dict())
+    data = payload.dict()
+    data["org_id"] = org_id
+
+    stock_level = await stock_level_service.create(session, data)
     await session.commit()
     await session.refresh(stock_level)
     return stock_level
@@ -75,16 +78,16 @@ async def create_stock_level(
 @router.patch("/{stock_level_id}", response_model=StockLevelRead)
 async def update_stock_level(
     stock_level_id: UUID,
-    payload: StockLevelUpdate,
     org_id: UUID,
+    payload: StockLevelUpdate,
     session: AsyncSession = Depends(get_session),
-    user = Depends(require_admin),        # 🔒 admin/manager/owner
+    user=Depends(require_admin),
 ):
     stock_level = await stock_level_service.get_by_id(session, stock_level_id)
 
     if not stock_level or stock_level.org_id != org_id:
         raise HTTPException(
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="Stock level not found",
         )
 
