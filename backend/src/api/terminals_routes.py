@@ -7,7 +7,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.database import get_session
-from src.core.security.dependencies import require_any_staff, require_admin
+from src.core.security.org_context import get_current_org
+from src.core.security.dependencies import (
+    require_any_staff_org,
+    require_admin_org,
+)
 from src.schemas.pos_schemas import (
     TerminalCreate,
     TerminalRead,
@@ -24,12 +28,13 @@ router = APIRouter(prefix="/terminals", tags=["terminals"])
 # ---------------------------------------------------------
 @router.get("/", response_model=List[TerminalRead])
 async def list_terminals(
-    org_id: UUID,
     limit: int = 100,
     offset: int = 0,
     session: AsyncSession = Depends(get_session),
-    user=Depends(require_any_staff),
+    org_ctx=Depends(get_current_org),
+    user=Depends(require_any_staff_org),
 ):
+    org_id = org_ctx["org"].org_id
     return await terminal_service.get_by_org(session, org_id, limit, offset)
 
 
@@ -39,10 +44,12 @@ async def list_terminals(
 @router.get("/{terminal_id}", response_model=TerminalRead)
 async def get_terminal(
     terminal_id: UUID,
-    org_id: UUID,
     session: AsyncSession = Depends(get_session),
-    user=Depends(require_any_staff),
+    org_ctx=Depends(get_current_org),
+    user=Depends(require_any_staff_org),
 ):
+    org_id = org_ctx["org"].org_id
+
     terminal = await terminal_service.get_by_id(session, terminal_id)
 
     if not terminal or terminal.org_id != org_id:
@@ -59,11 +66,13 @@ async def get_terminal(
 # ---------------------------------------------------------
 @router.post("/", response_model=TerminalRead, status_code=status.HTTP_201_CREATED)
 async def create_terminal(
-    org_id: UUID,
     payload: TerminalCreate,
     session: AsyncSession = Depends(get_session),
-    user=Depends(require_admin),
+    org_ctx=Depends(get_current_org),
+    user=Depends(require_admin_org),
 ):
+    org_id = org_ctx["org"].org_id
+
     data = payload.dict()
     data["org_id"] = org_id
 
@@ -79,11 +88,13 @@ async def create_terminal(
 @router.patch("/{terminal_id}", response_model=TerminalRead)
 async def update_terminal(
     terminal_id: UUID,
-    org_id: UUID,
     payload: TerminalUpdate,
     session: AsyncSession = Depends(get_session),
-    user=Depends(require_admin),
+    org_ctx=Depends(get_current_org),
+    user=Depends(require_admin_org),
 ):
+    org_id = org_ctx["org"].org_id
+
     terminal = await terminal_service.get_by_id(session, terminal_id)
 
     if not terminal or terminal.org_id != org_id:
@@ -106,10 +117,12 @@ async def update_terminal(
 @router.delete("/{terminal_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_terminal(
     terminal_id: UUID,
-    org_id: UUID,
     session: AsyncSession = Depends(get_session),
-    user=Depends(require_admin),
+    org_ctx=Depends(get_current_org),
+    user=Depends(require_admin_org),
 ):
+    org_id = org_ctx["org"].org_id
+
     terminal = await terminal_service.get_by_id(session, terminal_id)
 
     if not terminal or terminal.org_id != org_id:

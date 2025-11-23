@@ -7,7 +7,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.database import get_session
-from src.core.security.dependencies import require_any_staff, require_admin
+from src.core.security.org_context import get_current_org
+from src.core.security.dependencies import require_any_staff_org, require_admin_org
 from src.schemas.pos_schemas import (
     TaxRateCreate,
     TaxRateRead,
@@ -24,12 +25,13 @@ router = APIRouter(prefix="/tax-rates", tags=["tax-rates"])
 # ---------------------------------------------------------
 @router.get("/", response_model=List[TaxRateRead])
 async def list_tax_rates(
-    org_id: UUID,
     limit: int = 100,
     offset: int = 0,
     session: AsyncSession = Depends(get_session),
-    user=Depends(require_any_staff),
+    org_ctx = Depends(get_current_org),
+    user=Depends(require_any_staff_org),
 ):
+    org_id = org_ctx["org"].org_id
     return await tax_rate_service.get_by_org(session, org_id, limit, offset)
 
 
@@ -39,10 +41,11 @@ async def list_tax_rates(
 @router.get("/{tax_id}", response_model=TaxRateRead)
 async def get_tax_rate(
     tax_id: UUID,
-    org_id: UUID,
     session: AsyncSession = Depends(get_session),
-    user=Depends(require_any_staff),
+    org_ctx = Depends(get_current_org),
+    user=Depends(require_any_staff_org),
 ):
+    org_id = org_ctx["org"].org_id
     tax_rate = await tax_rate_service.get_by_id(session, tax_id)
 
     if not tax_rate or tax_rate.org_id != org_id:
@@ -59,11 +62,12 @@ async def get_tax_rate(
 # ---------------------------------------------------------
 @router.post("/", response_model=TaxRateRead, status_code=status.HTTP_201_CREATED)
 async def create_tax_rate(
-    org_id: UUID,
     payload: TaxRateCreate,
     session: AsyncSession = Depends(get_session),
-    user=Depends(require_admin),
+    org_ctx = Depends(get_current_org),
+    user=Depends(require_admin_org),
 ):
+    org_id = org_ctx["org"].org_id
     data = payload.dict()
     data["org_id"] = org_id
 
@@ -79,11 +83,12 @@ async def create_tax_rate(
 @router.patch("/{tax_id}", response_model=TaxRateRead)
 async def update_tax_rate(
     tax_id: UUID,
-    org_id: UUID,
     payload: TaxRateUpdate,
     session: AsyncSession = Depends(get_session),
-    user=Depends(require_admin),
+    org_ctx = Depends(get_current_org),
+    user=Depends(require_admin_org),
 ):
+    org_id = org_ctx["org"].org_id
     tax_rate = await tax_rate_service.get_by_id(session, tax_id)
 
     if not tax_rate or tax_rate.org_id != org_id:
@@ -106,10 +111,11 @@ async def update_tax_rate(
 @router.delete("/{tax_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_tax_rate(
     tax_id: UUID,
-    org_id: UUID,
     session: AsyncSession = Depends(get_session),
-    user=Depends(require_admin),
+    org_ctx = Depends(get_current_org),
+    user=Depends(require_admin_org),
 ):
+    org_id = org_ctx["org"].org_id
     tax_rate = await tax_rate_service.get_by_id(session, tax_id)
 
     if not tax_rate or tax_rate.org_id != org_id:
@@ -122,8 +128,8 @@ async def delete_tax_rate(
 
     if not deleted:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Tax rate not found",
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Failed to delete tax rate",
         )
 
     await session.commit()

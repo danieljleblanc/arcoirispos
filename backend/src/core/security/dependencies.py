@@ -1,107 +1,89 @@
-import uuid
+# src/core/security/dependencies.py
+
 from fastapi import Depends, HTTPException, status
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.database import get_session
-from src.models.core.role_models import UserOrgRole
-from src.core.security.roles import Role
 from src.core.security.auth import get_current_user
+from src.core.security.org_context import get_current_org
+from src.core.security.roles import Role
 
 
 # =====================================================================
-# require_any_staff()
+# RBAC helpers bound to *current org* (Option B1)
 # ---------------------------------------------------------------------
-# Allows: owner, admin, manager, cashier, support (anything except viewer)
-# Ensures: user belongs to org_id and has a valid staff-level role
+# These assume:
+# - get_current_org() already validated org + membership
+# - we only need to check "how powerful" the role is
 # =====================================================================
-async def require_any_staff(
-    org_id: uuid.UUID,
+
+
+async def require_any_staff_org(
+    org_ctx=Depends(get_current_org),
     current_user=Depends(get_current_user),
-    session: AsyncSession = Depends(get_session),
 ):
     """
-    Ensure the current user belongs to this org with ANY staff role.
-    Disallowed: viewer or missing org membership.
+    Allow any STAFF-style role within the active org:
+
+    Allowed:
+      - owner
+      - admin
+      - manager
+      - cashier
+      - support   (if you choose to define this)
+    Blocked:
+      - viewer
+
+    Returns the current_user for convenience.
     """
 
-    result = await session.execute(
-        select(UserOrgRole.role)
-        .where(UserOrgRole.user_id == current_user.user_id)
-        .where(UserOrgRole.org_id == org_id)
-    )
-    role = result.scalar_one_or_none()
+    role = org_ctx["role"]
 
-    # No membership?
-    if not role:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="User is not part of this organization",
-        )
-
-    # "viewer" cannot perform any staff operations
     if role == Role.VIEWER.value:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Insufficient role (viewer)",
+            detail="Insufficient role (viewer cannot perform staff operations)",
         )
 
     return current_user
 
 
-# =====================================================================
-# require_admin()
-# ---------------------------------------------------------------------
-# Allows: owner, admin, manager
-# Ensures: user belongs to org and is allowed administrative operations
-# =====================================================================
-async def require_admin(
-    org_id: uuid.UUID,
+async def require_admin_org(
+    org_ctx=Depends(get_current_org),
     current_user=Depends(get_current_user),
-    session: AsyncSession = Depends(get_session),
 ):
     """
-    Requires owner/admin/manager role in this org.
-    Used for CREATE / UPDATE / DELETE operations.
+    Require an administrative role for this org:
+
+    Allowed:
+      - owner
+      - admin
+      - manager
+
+    Blocked:
+      - cashier
+      - support
+      - viewer
     """
 
-    result = await session.execute(
-        select(UserOrgRole.role)
-        .where(UserOrgRole.user_id == current_user.user_id)
-        .where(UserOrgRole.org_id == org_id)
-    )
-    role = result.scalar_one_or_none()
+    role = org_ctx["role"]
 
-    if role not in [Role.OWNER.value, Role.ADMIN.value, Role.MANAGER.value]:
+    if role not in (Role.OWNER.value, Role.ADMIN.value, Role.MANAGER.value):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Admin or Manager role required",
+            detail="Admin/Manager/Owner role required",
         )
 
     return current_user
 
 
-# =====================================================================
-# require_owner()
-# ---------------------------------------------------------------------
-# Allows: ONLY org owner
-# Ensures: user has full organization control
-# =====================================================================
-async def require_owner(
-    org_id: uuid.UUID,
+async def require_owner_org(
+    org_ctx=Depends(get_current_org),
     current_user=Depends(get_current_user),
-    session: AsyncSession = Depends(get_session),
 ):
     """
-    Requires owner role for sensitive organization-wide actions.
+    Require OWNER for very sensitive actions (billing, deleting org, etc).
     """
 
-    result = await session.execute(
-        select(UserOrgRole.role)
-        .where(UserOrgRole.user_id == current_user.user_id)
-        .where(UserOrgRole.org_id == org_id)
-    )
-    role = result.scalar_one_or_none()
+    role = org_ctx["role"]
 
     if role != Role.OWNER.value:
         raise HTTPException(
@@ -110,21 +92,3 @@ async def require_owner(
         )
 
     return current_user
-
-
-# =====================================================================
-# get_current_org() — kept for future Option C work (NOT used in Option A+)
-# ---------------------------------------------------------------------
-# Right now we always pass org_id explicitly to routes + RBAC dependencies.
-# This placeholder is here only so imports won't break if something still
-# references get_current_org. It simply echoes the org_id.
-# =====================================================================
-async def get_current_org(org_id: uuid.UUID):
-    """
-    Placeholder for a future, richer OrgContext.
-
-    Currently:
-    - Just returns the org_id passed in.
-    - Not used by Option A+ routes; org_id is explicit.
-    """
-    return org_id

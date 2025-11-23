@@ -1,7 +1,10 @@
+# backend/src/api/auth_routes.py
+
+from typing import Optional
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel, EmailStr
-from typing import Optional
 
 from src.core.database import get_session
 from src.services.core.auth_service import (
@@ -51,8 +54,9 @@ async def login(
     Authenticate a user and return a token pair.
 
     Notes:
-    - Does NOT require org context (users may belong to multiple orgs).
-    - Email normalization handled inside authenticate_user().
+    - Login does NOT require org context.
+    - Users may belong to multiple orgs.
+    - Org selection happens later through X-Org-ID header.
     """
     user = await authenticate_user(session, payload.email, payload.password)
 
@@ -62,7 +66,7 @@ async def login(
             detail="Invalid credentials",
         )
 
-    # Tokens include user_id; org selection comes later on workflows that require it.
+    # Tokens include user_id only; org is determined per request via X-Org-ID.
     return create_tokens_for_user(user)
 
 
@@ -74,11 +78,12 @@ async def refresh_token_endpoint(payload: RefreshRequest):
     """
     Exchange a refresh token for a new access token.
 
-    NOTE:
-    - Matches your legacy behavior (no DB lookup).
-    - In Phase 3 we can add DB-validated refresh tokens, rotation, revocation, etc.
+    Phase 3:
+    - We may add DB-validated refresh tokens, rotation, revocation.
+    - For now, legacy stateless refresh is preserved.
     """
     data = refresh_access_token(payload.refresh_token)
+
     if not data:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

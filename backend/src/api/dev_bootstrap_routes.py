@@ -1,3 +1,5 @@
+# backend/src/api/dev_bootstrap_routes.py
+
 from fastapi import APIRouter, Depends, status, Header, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -16,17 +18,16 @@ router = APIRouter(prefix="/dev", tags=["dev-tools"])
 
 
 # ---------------------------------------------------------
-# SECURITY: lock dev-only routes behind a secret header
+# SECURITY: Protect dev-only endpoints with X-DEV-SECRET
 # ---------------------------------------------------------
 async def verify_dev_secret(x_dev_secret: str = Header(None)):
     """
     Protects dev-only routes using a secret from .env.
     Requires header:  X-DEV-SECRET: <value>
     """
-
     expected = settings.dev_admin_secret
 
-    if expected is None or expected.strip() == "":
+    if not expected:
         raise HTTPException(
             status_code=500,
             detail="DEV_ADMIN_SECRET not configured",
@@ -40,7 +41,7 @@ async def verify_dev_secret(x_dev_secret: str = Header(None)):
 
 
 # ---------------------------------------------------------
-# DEV BOOTSTRAP: Create Admin
+# DEV BOOTSTRAP: Create/Return Admin User (idempotent)
 # ---------------------------------------------------------
 @router.post(
     "/create-admin",
@@ -51,8 +52,9 @@ async def create_admin_user(
     session: AsyncSession = Depends(get_session),
 ):
     """
-    Creates a development admin user.
-    Safe to run multiple times — if the user exists, returns it.
+    Idempotently creates a development admin user.
+    - If the admin exists, returns the existing record.
+    - Ensures at least one organization exists.
     """
 
     admin_email = "admin@example.com"
@@ -97,6 +99,7 @@ async def create_admin_user(
     # 3. Create new admin user
     # -----------------------------
     admin = User(
+        user_id=uuid4(),
         email=admin_email,
         display_name="Dev Admin",
         password_hash=hash_password("password123"),

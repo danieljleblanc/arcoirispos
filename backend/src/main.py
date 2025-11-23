@@ -6,6 +6,10 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from src.api.routes import api_router
 
+
+# ---------------------------------------------------------
+# FASTAPI INITIALIZATION
+# ---------------------------------------------------------
 app = FastAPI(
     title="ArcoirisPOS API",
     description="Backend API for Arcoiris POS System",
@@ -14,37 +18,38 @@ app = FastAPI(
 
 
 # ---------------------------------------------------------
-# CORS (required for frontend to call API)
+# CORS (development defaults — tighten in production)
 # ---------------------------------------------------------
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],        # adjust for production later
+    allow_origins=["*"],        # Change to explicit origins before launch
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+
 # ---------------------------------------------------------
-# Routers
+# ROUTERS: unified /api prefix (matches routes.py)
 # ---------------------------------------------------------
-app.include_router(api_router, prefix="/api")
+app.include_router(api_router)
 
 
 # ---------------------------------------------------------
-# Custom OpenAPI to enable BearerAuth instead of OAuth2
+# CUSTOM OPENAPI — JWT Bearer Authentication (global)
 # ---------------------------------------------------------
 def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema
 
     openapi_schema = get_openapi(
-        title="ArcoirisPOS API",
-        version="1.0.0",
-        description="Backend API for Arcoiris POS System",
+        title=app.title,
+        version=app.version,
+        description=app.description,
         routes=app.routes,
     )
 
-    # 🔥 Add REAL JWT Bearer Authentication
+    # Add JWT Bearer scheme
     openapi_schema["components"]["securitySchemes"] = {
         "BearerAuth": {
             "type": "http",
@@ -53,10 +58,12 @@ def custom_openapi():
         }
     }
 
-    # 🔥 Apply BearerAuth globally
+    # Apply globally to all endpoints
     openapi_schema["security"] = [{"BearerAuth": []}]
 
     app.openapi_schema = openapi_schema
     return app.openapi_schema
 
+
+# Override FastAPI OpenAPI generator
 app.openapi = custom_openapi

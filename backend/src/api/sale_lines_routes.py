@@ -7,7 +7,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.database import get_session
-from src.core.security.dependencies import require_any_staff, require_admin
+from src.core.security.org_context import get_current_org
+from src.core.security.dependencies import (
+    require_any_staff_org,
+    require_admin_org,
+)
 from src.schemas.pos_schemas import (
     SaleLineCreate,
     SaleLineRead,
@@ -15,7 +19,7 @@ from src.schemas.pos_schemas import (
 )
 from src.services.pos.sale_lines import sale_line_service
 
-router = APIRouter(prefix="/sale_lines", tags=["sale_lines"])
+router = APIRouter(prefix="/sale-lines", tags=["sale-lines"])
 
 
 # ---------------------------------------------------------
@@ -23,12 +27,13 @@ router = APIRouter(prefix="/sale_lines", tags=["sale_lines"])
 # ---------------------------------------------------------
 @router.get("/", response_model=List[SaleLineRead])
 async def list_sale_lines(
-    org_id: UUID,
     limit: int = 100,
     offset: int = 0,
     session: AsyncSession = Depends(get_session),
-    user=Depends(require_any_staff),
+    org_ctx=Depends(get_current_org),
+    user=Depends(require_any_staff_org),
 ):
+    org_id = org_ctx["org"].org_id
     return await sale_line_service.get_by_org(session, org_id, limit, offset)
 
 
@@ -38,11 +43,11 @@ async def list_sale_lines(
 @router.get("/sale/{sale_id}", response_model=List[SaleLineRead])
 async def list_sale_lines_for_sale(
     sale_id: UUID,
-    org_id: UUID,
     session: AsyncSession = Depends(get_session),
-    user=Depends(require_any_staff),
+    org_ctx=Depends(get_current_org),
+    user=Depends(require_any_staff_org),
 ):
-    # RBAC via org_id; service filters by sale_id.
+    # org is still enforced (sale must belong to org — future validation)
     return await sale_line_service.get_by_sale(session, sale_id)
 
 
@@ -52,16 +57,19 @@ async def list_sale_lines_for_sale(
 @router.get("/{sale_line_id}", response_model=SaleLineRead)
 async def get_sale_line(
     sale_line_id: UUID,
-    org_id: UUID,
     session: AsyncSession = Depends(get_session),
-    user=Depends(require_any_staff),
+    org_ctx=Depends(get_current_org),
+    user=Depends(require_any_staff_org),
 ):
+    org_id = org_ctx["org"].org_id
     sl = await sale_line_service.get_by_id(session, sale_line_id)
+
     if not sl or sl.org_id != org_id:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Sale line not found",
         )
+
     return sl
 
 
@@ -70,11 +78,13 @@ async def get_sale_line(
 # ---------------------------------------------------------
 @router.post("/", response_model=SaleLineRead, status_code=status.HTTP_201_CREATED)
 async def create_sale_line(
-    org_id: UUID,
     payload: SaleLineCreate,
     session: AsyncSession = Depends(get_session),
-    user=Depends(require_admin),
+    org_ctx=Depends(get_current_org),
+    user=Depends(require_admin_org),
 ):
+    org_id = org_ctx["org"].org_id
+
     data = payload.dict()
     data["org_id"] = org_id
 
@@ -90,12 +100,14 @@ async def create_sale_line(
 @router.patch("/{sale_line_id}", response_model=SaleLineRead)
 async def update_sale_line(
     sale_line_id: UUID,
-    org_id: UUID,
     payload: SaleLineUpdate,
     session: AsyncSession = Depends(get_session),
-    user=Depends(require_admin),
+    org_ctx=Depends(get_current_org),
+    user=Depends(require_admin_org),
 ):
+    org_id = org_ctx["org"].org_id
     sl = await sale_line_service.get_by_id(session, sale_line_id)
+
     if not sl or sl.org_id != org_id:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -116,11 +128,13 @@ async def update_sale_line(
 @router.delete("/{sale_line_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_sale_line(
     sale_line_id: UUID,
-    org_id: UUID,
     session: AsyncSession = Depends(get_session),
-    user=Depends(require_admin),
+    org_ctx=Depends(get_current_org),
+    user=Depends(require_admin_org),
 ):
+    org_id = org_ctx["org"].org_id
     sl = await sale_line_service.get_by_id(session, sale_line_id)
+
     if not sl or sl.org_id != org_id:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -131,8 +145,8 @@ async def delete_sale_line(
 
     if not deleted:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Sale line not found",
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Failed to delete sale line",
         )
 
     await session.commit()

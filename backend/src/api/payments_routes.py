@@ -7,7 +7,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.database import get_session
-from src.core.security.dependencies import require_any_staff, require_admin
+from src.core.security.org_context import get_current_org
+from src.core.security.dependencies import (
+    require_any_staff_org,
+    require_admin_org,
+)
 from src.schemas.pos_schemas import (
     PaymentCreate,
     PaymentRead,
@@ -23,12 +27,13 @@ router = APIRouter(prefix="/payments", tags=["payments"])
 # ---------------------------------------------------------
 @router.get("/", response_model=List[PaymentRead])
 async def list_payments(
-    org_id: UUID,
     limit: int = 100,
     offset: int = 0,
     session: AsyncSession = Depends(get_session),
-    user=Depends(require_any_staff),
+    org_ctx=Depends(get_current_org),
+    user=Depends(require_any_staff_org),
 ):
+    org_id = org_ctx["org"].org_id
     return await payment_service.get_by_org(session, org_id, limit, offset)
 
 
@@ -38,11 +43,11 @@ async def list_payments(
 @router.get("/sale/{sale_id}", response_model=List[PaymentRead])
 async def list_payments_for_sale(
     sale_id: UUID,
-    org_id: UUID,
     session: AsyncSession = Depends(get_session),
-    user=Depends(require_any_staff),
+    org_ctx=Depends(get_current_org),
+    user=Depends(require_any_staff_org),
 ):
-    # NOTE: service filters by sale_id; RBAC is still enforced via org_id.
+    # org_id still matters (sale must belong to org), handled in service layer later
     return await payment_service.get_by_sale(session, sale_id)
 
 
@@ -52,16 +57,19 @@ async def list_payments_for_sale(
 @router.get("/{payment_id}", response_model=PaymentRead)
 async def get_payment(
     payment_id: UUID,
-    org_id: UUID,
     session: AsyncSession = Depends(get_session),
-    user=Depends(require_any_staff),
+    org_ctx=Depends(get_current_org),
+    user=Depends(require_any_staff_org),
 ):
+    org_id = org_ctx["org"].org_id
     payment = await payment_service.get_by_id(session, payment_id)
+
     if not payment or payment.org_id != org_id:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Payment not found",
         )
+
     return payment
 
 
@@ -70,11 +78,13 @@ async def get_payment(
 # ---------------------------------------------------------
 @router.post("/", response_model=PaymentRead, status_code=status.HTTP_201_CREATED)
 async def create_payment(
-    org_id: UUID,
     payload: PaymentCreate,
     session: AsyncSession = Depends(get_session),
-    user=Depends(require_admin),
+    org_ctx=Depends(get_current_org),
+    user=Depends(require_admin_org),
 ):
+    org_id = org_ctx["org"].org_id
+
     data = payload.dict()
     data["org_id"] = org_id
 
@@ -90,12 +100,14 @@ async def create_payment(
 @router.patch("/{payment_id}", response_model=PaymentRead)
 async def update_payment(
     payment_id: UUID,
-    org_id: UUID,
     payload: PaymentUpdate,
     session: AsyncSession = Depends(get_session),
-    user=Depends(require_admin),
+    org_ctx=Depends(get_current_org),
+    user=Depends(require_admin_org),
 ):
+    org_id = org_ctx["org"].org_id
     payment = await payment_service.get_by_id(session, payment_id)
+
     if not payment or payment.org_id != org_id:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -116,11 +128,13 @@ async def update_payment(
 @router.delete("/{payment_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_payment(
     payment_id: UUID,
-    org_id: UUID,
     session: AsyncSession = Depends(get_session),
-    user=Depends(require_admin),
+    org_ctx=Depends(get_current_org),
+    user=Depends(require_admin_org),
 ):
+    org_id = org_ctx["org"].org_id
     payment = await payment_service.get_by_id(session, payment_id)
+
     if not payment or payment.org_id != org_id:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -131,8 +145,8 @@ async def delete_payment(
 
     if not deleted:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Payment not found",
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Failed to delete payment",
         )
 
     await session.commit()
