@@ -1,0 +1,84 @@
+🎉 ArcoirisPOS Backend v0.10.1 — Architecture Stability Release
+
+This release introduces a major stabilization of the authentication and multi-organization system.
+It completes the OrgContext (Option A+) design — the foundation for secure multi-tenant operation of ArcoirisPOS.
+
+🔒 Security & Authentication Improvements
+
+Corrected bcrypt hashes in the seed migration
+
+Unified login and refresh token workflow
+
+All protected routes now enforce:
+
+Bearer authentication
+
+X-Org-ID header
+
+Role-based authorization
+
+🏗️ Architecture Refactor: OrgContext (Option A+)
+
+All routes now follow a single, clean dependency pattern:
+
+Org comes from request header (X-Org-ID)
+
+RBAC validated via require_any_staff or require_admin
+
+Payloads have org_id injected server-side (no client trust)
+
+This new pattern eliminates the scattered dependency signatures and route divergence of earlier versions.
+
+🔧 Route Updates
+
+All POS and Inventory endpoints updated to the new signature:
+
+Customers
+
+Sales
+
+Items
+
+Locations
+
+Payments
+
+Terminals
+
+Stock Movements
+
+Stock Levels
+
+Tax Rates
+
+Admin Stock Adjustments
+
+Legacy experimental route files (src/api/api_old) have been removed.
+
+🗄️ Database & Alembic
+
+Full re-run of Alembic migrations produces a clean, consistent schema
+
+Corrected seed hashes ensure login works out-of-the-box
+
+Verified with container-level bcrypt hashing tests
+
+🚀 What’s Next
+
+v0.11.x → SystemHub Dashboard integration
+
+Stable Data Save routines
+
+Polishing for Beta 1.0 release
+
+Install / Upgrade
+
+Run:
+
+git pull
+docker compose down -v
+docker compose up --build
+docker exec -it arcoirispos_backend bash
+alembic upgrade head
+
+🎉 This release lays the foundation for a fully stable, multi-org, RBAC-secured POS system.
