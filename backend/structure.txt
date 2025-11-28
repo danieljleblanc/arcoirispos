@@ -1,0 +1,360 @@
+src/app
+├── __init__.py
+├── __pycache__
+│   ├── __init__.cpython-314.pyc
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   └── __init__.cpython-314.pyc
+│   ├── api_router.cpython-314.pyc
+│   └── main.cpython-314.pyc
+├── accounting
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   └── __init__.cpython-314.pyc
+│   ├── enums
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-314.pyc
+│   │   │   └── models.cpython-314.pyc
+│   │   └── models.py
+│   ├── models
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-314.pyc
+│   │   │   ├── __init__.py
+│   │   │   ├── __pycache__
+│   │   │   │   └── __init__.cpython-314.pyc
+│   │   │   ├── account_models.cpython-314.pyc
+│   │   │   ├── bank_account_models.cpython-314.pyc
+│   │   │   ├── customer_balance_models.cpython-314.pyc
+│   │   │   ├── enums.cpython-314.pyc
+│   │   │   ├── journal_line_models.cpython-314.pyc
+│   │   │   └── journal_models.cpython-314.pyc
+│   │   ├── account_models.py
+│   │   ├── account_models.py.bak
+│   │   ├── bank_account_models.py
+│   │   ├── bank_account_models.py.bak
+│   │   ├── customer_balance_models.py
+│   │   ├── customer_balance_models.py.bak
+│   │   ├── enums.py
+│   │   ├── journal_line_models.py
+│   │   ├── journal_line_models.py.bak
+│   │   ├── journal_models.py
+│   │   └── journal_models.py.bak
+│   ├── routes
+│   │   ├── __init__.py
+│   │   └── __pycache__
+│   │       └── __init__.cpython-314.pyc
+│   ├── schemas
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-314.pyc
+│   │   │   ├── __init__.py
+│   │   │   ├── __pycache__
+│   │   │   │   └── __init__.cpython-314.pyc
+│   │   │   └── acct_schemas.cpython-314.pyc
+│   │   └── acct_schemas.py
+│   └── services
+│       ├── __init__.py
+│       ├── __pycache__
+│       │   ├── __init__.cpython-314.pyc
+│       │   ├── __init__.py
+│       │   ├── __pycache__
+│       │   │   └── __init__.cpython-314.pyc
+│       │   └── accounts.cpython-314.pyc
+│       ├── accounts.py
+│       └── accounts.py.bak
+├── api_router.py
+├── auth
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   └── __init__.cpython-314.pyc
+│   ├── models
+│   │   ├── __init__.py
+│   │   └── __pycache__
+│   │       └── __init__.cpython-314.pyc
+│   ├── routes
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-314.pyc
+│   │   │   ├── __init__.py
+│   │   │   ├── __pycache__
+│   │   │   │   └── __init__.cpython-314.pyc
+│   │   │   └── auth_routes.cpython-314.pyc
+│   │   └── auth_routes.py
+│   ├── schemas
+│   │   ├── __init__.py
+│   │   └── __pycache__
+│   │       └── __init__.cpython-314.pyc
+│   └── services
+│       ├── __init__.py
+│       ├── __pycache__
+│       │   ├── __init__.cpython-314.pyc
+│       │   ├── __init__.py
+│       │   ├── __pycache__
+│       │   │   └── __init__.cpython-314.pyc
+│       │   ├── auth.cpython-314.pyc
+│       │   ├── dependencies.cpython-314.pyc
+│       │   ├── hashing.cpython-314.pyc
+│       │   ├── jwt_utils.cpython-314.pyc
+│       │   ├── org_context.cpython-314.pyc
+│       │   ├── permissions.cpython-314.pyc
+│       │   ├── roles.cpython-314.pyc
+│       │   ├── schemas.cpython-314.pyc
+│       │   └── security.cpython-314.pyc
+│       ├── auth.py
+│       ├── dependencies.py
+│       ├── hashing.py
+│       ├── jwt_utils.py
+│       ├── org_context.py
+│       ├── permissions.py
+│       ├── roles.py
+│       ├── schemas.py
+│       └── security.py
+├── core
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   ├── __init__.cpython-314.pyc
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   └── __init__.cpython-314.pyc
+│   │   ├── base_repository.cpython-314.pyc
+│   │   ├── base.cpython-314.pyc
+│   │   ├── config.cpython-314.pyc
+│   │   └── database.cpython-314.pyc
+│   ├── base_repository.py
+│   ├── base.py
+│   ├── config.py
+│   └── database.py
+├── infrastructure
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   └── __init__.cpython-314.pyc
+│   └── migrations
+│       ├── __init__.py
+│       ├── __pycache__
+│       │   ├── __init__.cpython-314.pyc
+│       │   ├── __init__.py
+│       │   ├── __pycache__
+│       │   │   └── __init__.cpython-314.pyc
+│       │   └── env.cpython-314.pyc
+│       ├── env.py
+│       ├── manual_sql
+│       │   ├── __init__.py
+│       │   ├── __pycache__
+│       │   │   └── __init__.cpython-314.pyc
+│       │   ├── 001_init_arcoirispos.sql
+│       │   ├── 001_migration_index.sql
+│       │   └── 003_sales_OLD.txt
+│       ├── README
+│       ├── README_MIGRATIONS.md
+│       ├── script.py.mako
+│       └── versions
+│           ├── __init__.py
+│           ├── __pycache__
+│           │   ├── __init__.cpython-314.pyc
+│           │   ├── __init__.py
+│           │   ├── __pycache__
+│           │   ├── 000000000001_baseline_schema_collapse.cpython-314.pyc
+│           │   ├── 2864583ca021_seed_initial_data.cpython-314.pyc
+│           │   ├── 37a02ec8662a_init_schema.cpython-314.pyc
+│           │   └── 853113448960_template_sanity_test.cpython-314.pyc
+│           ├── 000000000001_baseline_schema_collapse.py
+│           ├── 2864583ca021_seed_initial_data.py
+│           ├── 2864583ca021_seed_initial_data.py.bak
+│           ├── 37a02ec8662a_init_schema.py
+│           ├── 37a02ec8662a_init_schema.py.bak
+│           └── 853113448960_template_sanity_test.py
+├── inventory
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   └── __init__.cpython-314.pyc
+│   ├── models
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-314.pyc
+│   │   │   ├── __init__.py
+│   │   │   ├── __pycache__
+│   │   │   │   └── __init__.cpython-314.pyc
+│   │   │   ├── item_models.cpython-314.pyc
+│   │   │   ├── location_models.cpython-314.pyc
+│   │   │   ├── stock_level_models.cpython-314.pyc
+│   │   │   └── stock_movement_models.cpython-314.pyc
+│   │   ├── item_models.py
+│   │   ├── location_models.py
+│   │   ├── stock_level_models.py
+│   │   └── stock_movement_models.py
+│   ├── routes
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-314.pyc
+│   │   │   ├── __init__.py
+│   │   │   ├── __pycache__
+│   │   │   │   └── __init__.cpython-314.pyc
+│   │   │   ├── admin_stock_adjust_routes.cpython-314.pyc
+│   │   │   ├── items_routes.cpython-314.pyc
+│   │   │   ├── locations_routes.cpython-314.pyc
+│   │   │   ├── stock_levels_routes.cpython-314.pyc
+│   │   │   └── stock_movements_routes.cpython-314.pyc
+│   │   ├── admin_stock_adjust_routes.py
+│   │   ├── items_routes.py
+│   │   ├── locations_routes.py
+│   │   ├── stock_levels_routes.py
+│   │   └── stock_movements_routes.py
+│   ├── schemas
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-314.pyc
+│   │   │   ├── __init__.py
+│   │   │   ├── __pycache__
+│   │   │   │   └── __init__.cpython-314.pyc
+│   │   │   └── inv_schemas.cpython-314.pyc
+│   │   └── inv_schemas.py
+│   └── services
+│       ├── __init__.py
+│       ├── __pycache__
+│       │   ├── __init__.cpython-314.pyc
+│       │   ├── __init__.py
+│       │   ├── __pycache__
+│       │   │   └── __init__.cpython-314.pyc
+│       │   ├── items.cpython-314.pyc
+│       │   ├── locations.cpython-314.pyc
+│       │   ├── stock_adjustments.cpython-314.pyc
+│       │   ├── stock_levels.cpython-314.pyc
+│       │   └── stock_movements.cpython-314.pyc
+│       ├── items.py
+│       ├── locations.py
+│       ├── stock_adjustments.py
+│       ├── stock_levels.py
+│       └── stock_movements.py
+├── main.py
+├── org
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   └── __init__.cpython-314.pyc
+│   ├── models
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-314.pyc
+│   │   │   ├── __init__.py
+│   │   │   ├── __pycache__
+│   │   │   │   └── __init__.cpython-314.pyc
+│   │   │   ├── organization_models.cpython-314.pyc
+│   │   │   ├── role_models.cpython-314.pyc
+│   │   │   └── user_models.cpython-314.pyc
+│   │   ├── organization_models.py
+│   │   └── role_models.py
+│   ├── repositories
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-314.pyc
+│   │   │   ├── org_repository.cpython-314.pyc
+│   │   │   ├── role_repository.cpython-314.pyc
+│   │   │   └── user_repository.cpython-314.pyc
+│   │   ├── org_repository.py
+│   │   ├── role_repository.py
+│   │   └── user_repository.py
+│   ├── routes
+│   │   ├── __init__.py
+│   │   └── __pycache__
+│   │       └── __init__.cpython-314.pyc
+│   ├── schemas
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-314.pyc
+│   │   │   ├── __init__.py
+│   │   │   ├── __pycache__
+│   │   │   │   └── __init__.cpython-314.pyc
+│   │   │   └── core_schemas.cpython-314.pyc
+│   │   └── core_schemas.py
+│   ├── services
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-314.pyc
+│   │   │   ├── __init__.py
+│   │   │   ├── __pycache__
+│   │   │   │   └── __init__.cpython-314.pyc
+│   │   │   ├── auth_service.cpython-314.pyc
+│   │   │   └── roles.cpython-314.pyc
+│   │   ├── auth_service.py
+│   │   └── roles.py
+│   └── user_models
+│       ├── __pycache__
+│       │   └── models.cpython-314.pyc
+│       └── models.py
+└── pos
+    ├── __init__.py
+    ├── __pycache__
+    │   └── __init__.cpython-314.pyc
+    ├── models
+    │   ├── __init__.py
+    │   ├── __pycache__
+    │   │   ├── __init__.cpython-314.pyc
+    │   │   ├── __init__.py
+    │   │   ├── __pycache__
+    │   │   │   └── __init__.cpython-314.pyc
+    │   │   ├── customer_models.cpython-314.pyc
+    │   │   ├── payment_models.cpython-314.pyc
+    │   │   ├── sale_models.cpython-314.pyc
+    │   │   ├── tax_rate_models.cpython-314.pyc
+    │   │   └── terminal_models.cpython-314.pyc
+    │   ├── customer_models.py
+    │   ├── payment_models.py
+    │   ├── sale_models.py
+    │   ├── tax_rate_models.py
+    │   └── terminal_models.py
+    ├── routes
+    │   ├── __init__.py
+    │   ├── __pycache__
+    │   │   ├── __init__.cpython-314.pyc
+    │   │   ├── __init__.py
+    │   │   ├── __pycache__
+    │   │   │   └── __init__.cpython-314.pyc
+    │   │   ├── customer_routes.cpython-314.pyc
+    │   │   ├── models.cpython-314.pyc
+    │   │   ├── payments_routes.cpython-314.pyc
+    │   │   ├── sale_lines_routes.cpython-314.pyc
+    │   │   ├── sales_routes.cpython-314.pyc
+    │   │   ├── tax_rates_routes.cpython-314.pyc
+    │   │   └── terminals_routes.cpython-314.pyc
+    │   ├── customer_routes.py
+    │   ├── models.py
+    │   ├── payments_routes.py
+    │   ├── sale_lines_routes.py
+    │   ├── sales_routes.py
+    │   ├── tax_rates_routes.py
+    │   └── terminals_routes.py
+    ├── schemas
+    │   ├── __init__.py
+    │   ├── __pycache__
+    │   │   ├── __init__.cpython-314.pyc
+    │   │   ├── __init__.py
+    │   │   ├── __pycache__
+    │   │   │   └── __init__.cpython-314.pyc
+    │   │   └── pos_schemas.cpython-314.pyc
+    │   └── pos_schemas.py
+    └── services
+        ├── __init__.py
+        ├── __pycache__
+        │   ├── __init__.cpython-314.pyc
+        │   ├── __init__.py
+        │   ├── __pycache__
+        │   │   └── __init__.cpython-314.pyc
+        │   ├── checkout_service.cpython-314.pyc
+        │   ├── checkout.cpython-314.pyc
+        │   ├── customers.cpython-314.pyc
+        │   ├── payments.cpython-314.pyc
+        │   ├── sale_lines.cpython-314.pyc
+        │   ├── sales.cpython-314.pyc
+        │   ├── tax_rates.cpython-314.pyc
+        │   └── terminals.cpython-314.pyc
+        ├── checkout_service.py
+        ├── checkout.py
+        ├── customers.py
+        ├── payments.py
+        ├── sale_lines.py
+        ├── sales.py
+        ├── tax_rates.py
+        └── terminals.py
+
+88 directories, 270 files

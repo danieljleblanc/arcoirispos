@@ -1,0 +1,11 @@
+=== STARTING PHASE 2 BACKEND REFACTOR ===
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/main.py → /Volumes/dev/repos/arcoirispos/backend/src/app/main.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/database/migrations → /Volumes/dev/repos/arcoirispos/backend/src/app/infrastructure/migrations
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/core/config.py → /Volumes/dev/repos/arcoirispos/backend/src/app/core/config.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/core/database.py → /Volumes/dev/repos/arcoirispos/backend/src/app/core/database.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/services/base_repository.py → /Volumes/dev/repos/arcoirispos/backend/src/app/core/base_repository.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/api/routes.py → /Volumes/dev/repos/arcoirispos/backend/src/app/api_router.py
+[DELETE EMPTY] /Volumes/dev/repos/arcoirispos/backend/src/database
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/.DS_Store → /Volumes/dev/repos/arcoirispos/backend/backup_phase2/.DS_Store
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/wait_for_db.py → /Volumes/dev/repos/arcoirispos/backend/backup_phase2/wait_for_db.py
+=== PHASE 2 COMPLETE ===

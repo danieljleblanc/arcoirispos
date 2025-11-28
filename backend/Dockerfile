@@ -27,4 +27,5 @@ COPY .env .env
 EXPOSE 8000
 
 # Final CMD (only ONE allowed)
-CMD ["bash", "-c", "python wait_for_db.py && uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"]
+# Note: docker-compose.yml overrides this, but keeping correct path for reference
+CMD ["bash", "-c", "uvicorn src.app.main:app --host 0.0.0.0 --port 8000 --reload"]

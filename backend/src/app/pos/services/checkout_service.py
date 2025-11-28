@@ -8,11 +8,20 @@ from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.app.inventory.models.item_models import Item, TaxRate
-from src.app.pos.schemas.pos_schemas import SaleCreate, SaleLineCreate, PaymentCreate
-# Placeholder — you can fill real engine later
-checkout_engine = None
+# ✔ FIXED: Import only Item from inventory
+from src.app.inventory.models.item_models import Item
 
+# ✔ FIXED: Import TaxRate from POS where it actually exists
+from src.app.pos.models.tax_rate_models import TaxRate
+
+from src.app.pos.schemas.pos_schemas import (
+    SaleCreate,
+    SaleLineCreate,
+    PaymentCreate,
+)
+
+# Placeholder — you can plug in real engine later
+checkout_engine = None
 
 
 class CheckoutService:
@@ -24,7 +33,7 @@ class CheckoutService:
     """
 
     # ---------------------------------------------------------
-    # VALIDATION STEP (NEW)
+    # VALIDATION
     # ---------------------------------------------------------
     async def validate(self, session: AsyncSession, sale: SaleCreate):
 
@@ -76,12 +85,10 @@ class CheckoutService:
                 detail="Payment amounts cannot be negative."
             )
 
-        # Nothing returned = validation OK
         return True
 
-
     # ---------------------------------------------------------
-    # LOADERS (UNCHANGED)
+    # LOADERS
     # ---------------------------------------------------------
     async def load_items(self, session: AsyncSession, org_id: UUID, item_ids: List[UUID]):
         if not item_ids:
@@ -95,7 +102,6 @@ class CheckoutService:
         result = await session.execute(stmt)
         return list(result.scalars().all())
 
-
     async def load_tax_rates(self, session: AsyncSession, org_id: UUID, tax_ids: List[UUID]):
         if not tax_ids:
             return []
@@ -108,9 +114,8 @@ class CheckoutService:
         result = await session.execute(stmt)
         return list(result.scalars().all())
 
-
     # ---------------------------------------------------------
-    # CALCULATION (UNCHANGED)
+    # CALCULATION (DELEGATES TO checkout_engine)
     # ---------------------------------------------------------
     async def calculate(self, session: AsyncSession, sale: SaleCreate) -> dict:
 
@@ -119,6 +124,12 @@ class CheckoutService:
 
         items = await self.load_items(session, sale.org_id, item_ids)
         tax_rates = await self.load_tax_rates(session, sale.org_id, tax_ids)
+
+        if checkout_engine is None:
+            raise HTTPException(
+                status_code=500,
+                detail="Checkout engine is not initialized."
+            )
 
         return checkout_engine.calculate_sale(sale, items, tax_rates)
 

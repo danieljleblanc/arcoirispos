@@ -7,6 +7,39 @@ from sqlalchemy import create_engine, pool
 from src.app.core.base import Base
 from src.app.core.config import settings
 
+# ----------------------------------------------------------------------
+# Import all model modules so Alembic sees every table in Base.metadata
+# ----------------------------------------------------------------------
+
+# Core / org models
+from src.app.org.models import organization_models, role_models, user_models
+
+# Accounting models
+from src.app.accounting.models import (
+    account_models,
+    bank_account_models,
+    customer_balance_models,
+    journal_models,
+    journal_line_models,
+)
+
+# Inventory models
+from src.app.inventory.models import (
+    item_models,
+    location_models,
+    stock_level_models,
+    stock_movement_models,
+)
+
+# POS models
+from src.app.pos.models import (
+    customer_models,
+    payment_models,
+    sale_models,
+    terminal_models,
+    tax_rate_models,
+)
+
 
 # ---------------------------------------------------------
 # CONFIG USED ONLY DURING ALEMBIC RUNTIME
@@ -37,10 +70,10 @@ def include_object(obj, name, type_, reflected, compare_to):
         return False
     return True
 
-
 def process_revision_directives(context, revision, directives):
     if directives:
         script = directives[0]
+        # Remove empty auto-generated revisions
         if script.upgrade_ops.is_empty():
             directives[:] = []
 
@@ -115,6 +148,7 @@ def run_migrations():
         run_migrations_online(cfg)
 
 
-# IMPORTANT:
-# ❗ Do NOT call run_migrations() here.
-# Alembic itself invokes it.
+# ---------------------------------------------------------
+# Actually run migrations when Alembic loads env.py
+# ---------------------------------------------------------
+run_migrations()

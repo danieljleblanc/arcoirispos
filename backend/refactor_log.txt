@@ -1,0 +1,88 @@
+=== Starting Project Structure Refactor ===
+[CREATE] Domain folder created: /Volumes/dev/repos/arcoirispos/backend/src/app/auth/models
+[CREATE] Domain folder created: /Volumes/dev/repos/arcoirispos/backend/src/app/pos/models
+[CREATE] Domain folder created: /Volumes/dev/repos/arcoirispos/backend/src/app/inventory/models
+[CREATE] Domain folder created: /Volumes/dev/repos/arcoirispos/backend/src/app/accounting/models
+[CREATE] Domain folder created: /Volumes/dev/repos/arcoirispos/backend/src/app/org/models
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/models/pos/terminal_models.py → /Volumes/dev/repos/arcoirispos/backend/src/app/pos/models/terminal_models.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/models/pos/sale_models.py → /Volumes/dev/repos/arcoirispos/backend/src/app/pos/models/sale_models.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/models/pos/customer_models.py → /Volumes/dev/repos/arcoirispos/backend/src/app/pos/models/customer_models.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/models/pos/__init__.py → /Volumes/dev/repos/arcoirispos/backend/src/app/pos/models/__init__.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/models/pos/payment_models.py → /Volumes/dev/repos/arcoirispos/backend/src/app/pos/models/payment_models.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/models/pos/tax_rate_models.py → /Volumes/dev/repos/arcoirispos/backend/src/app/pos/models/tax_rate_models.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/models/inv/stock_movement_models.py → /Volumes/dev/repos/arcoirispos/backend/src/app/inventory/models/stock_movement_models.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/models/inv/stock_level_models.py → /Volumes/dev/repos/arcoirispos/backend/src/app/inventory/models/stock_level_models.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/models/inv/location_models.py → /Volumes/dev/repos/arcoirispos/backend/src/app/inventory/models/location_models.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/models/inv/__init__.py → /Volumes/dev/repos/arcoirispos/backend/src/app/inventory/models/__init__.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/models/inv/item_models.py → /Volumes/dev/repos/arcoirispos/backend/src/app/inventory/models/item_models.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/models/acct/enums.py → /Volumes/dev/repos/arcoirispos/backend/src/app/accounting/models/enums.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/models/acct/__init__.py → /Volumes/dev/repos/arcoirispos/backend/src/app/accounting/models/__init__.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/models/acct/account_models.py → /Volumes/dev/repos/arcoirispos/backend/src/app/accounting/models/account_models.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/models/acct/customer_balance_models.py → /Volumes/dev/repos/arcoirispos/backend/src/app/accounting/models/customer_balance_models.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/models/acct/journal_models.py → /Volumes/dev/repos/arcoirispos/backend/src/app/accounting/models/journal_models.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/models/acct/bank_account_models.py → /Volumes/dev/repos/arcoirispos/backend/src/app/accounting/models/bank_account_models.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/models/acct/journal_line_models.py → /Volumes/dev/repos/arcoirispos/backend/src/app/accounting/models/journal_line_models.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/models/core/organization_models.py → /Volumes/dev/repos/arcoirispos/backend/src/app/org/models/organization_models.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/models/core/__init__.py → /Volumes/dev/repos/arcoirispos/backend/src/app/org/models/__init__.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/models/core/user_models.py → /Volumes/dev/repos/arcoirispos/backend/src/app/org/models/user_models.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/models/core/role_models.py → /Volumes/dev/repos/arcoirispos/backend/src/app/org/models/role_models.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/schemas/pos_schemas.py → /Volumes/dev/repos/arcoirispos/backend/src/app/pos/schemas/pos_schemas.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/schemas/inv_schemas.py → /Volumes/dev/repos/arcoirispos/backend/src/app/inventory/schemas/inv_schemas.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/schemas/acct_schemas.py → /Volumes/dev/repos/arcoirispos/backend/src/app/accounting/schemas/acct_schemas.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/schemas/core_schemas.py → /Volumes/dev/repos/arcoirispos/backend/src/app/org/schemas/core_schemas.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/services/pos/tax_rates.py → /Volumes/dev/repos/arcoirispos/backend/src/app/pos/services/tax_rates.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/services/pos/terminals.py → /Volumes/dev/repos/arcoirispos/backend/src/app/pos/services/terminals.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/services/pos/payments.py → /Volumes/dev/repos/arcoirispos/backend/src/app/pos/services/payments.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/services/pos/sales.py → /Volumes/dev/repos/arcoirispos/backend/src/app/pos/services/sales.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/services/pos/checkout_service.py → /Volumes/dev/repos/arcoirispos/backend/src/app/pos/services/checkout_service.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/services/pos/__init__.py → /Volumes/dev/repos/arcoirispos/backend/src/app/pos/services/__init__.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/services/pos/checkout.py → /Volumes/dev/repos/arcoirispos/backend/src/app/pos/services/checkout.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/services/pos/customers.py → /Volumes/dev/repos/arcoirispos/backend/src/app/pos/services/customers.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/services/pos/sale_lines.py → /Volumes/dev/repos/arcoirispos/backend/src/app/pos/services/sale_lines.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/services/inv/stock_adjustments.py → /Volumes/dev/repos/arcoirispos/backend/src/app/inventory/services/stock_adjustments.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/services/inv/stock_movements.py → /Volumes/dev/repos/arcoirispos/backend/src/app/inventory/services/stock_movements.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/services/inv/__init__.py → /Volumes/dev/repos/arcoirispos/backend/src/app/inventory/services/__init__.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/services/inv/stock_levels.py → /Volumes/dev/repos/arcoirispos/backend/src/app/inventory/services/stock_levels.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/services/inv/items.py → /Volumes/dev/repos/arcoirispos/backend/src/app/inventory/services/items.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/services/inv/locations.py → /Volumes/dev/repos/arcoirispos/backend/src/app/inventory/services/locations.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/services/acct/accounts.py → /Volumes/dev/repos/arcoirispos/backend/src/app/accounting/services/accounts.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/services/acct/__init__.py → /Volumes/dev/repos/arcoirispos/backend/src/app/accounting/services/__init__.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/services/core/auth_service.py → /Volumes/dev/repos/arcoirispos/backend/src/app/org/services/auth_service.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/services/core/roles.py → /Volumes/dev/repos/arcoirispos/backend/src/app/org/services/roles.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/api/sales_routes.py → /Volumes/dev/repos/arcoirispos/backend/src/app/pos/routes/sales_routes.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/api/stock_movements_routes.py → /Volumes/dev/repos/arcoirispos/backend/src/app/inventory/routes/stock_movements_routes.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/api/locations_routes.py → /Volumes/dev/repos/arcoirispos/backend/src/app/inventory/routes/locations_routes.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/api/auth_routes.py → /Volumes/dev/repos/arcoirispos/backend/src/app/auth/routes/auth_routes.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/api/customer_routes.py → /Volumes/dev/repos/arcoirispos/backend/src/app/pos/routes/customer_routes.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/api/terminals_routes.py → /Volumes/dev/repos/arcoirispos/backend/src/app/pos/routes/terminals_routes.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/api/payments_routes.py → /Volumes/dev/repos/arcoirispos/backend/src/app/pos/routes/payments_routes.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/api/stock_levels_routes.py → /Volumes/dev/repos/arcoirispos/backend/src/app/inventory/routes/stock_levels_routes.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/api/sale_lines_routes.py → /Volumes/dev/repos/arcoirispos/backend/src/app/pos/routes/sale_lines_routes.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/api/admin_stock_adjust_routes.py → /Volumes/dev/repos/arcoirispos/backend/src/app/inventory/routes/admin_stock_adjust_routes.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/api/items_routes.py → /Volumes/dev/repos/arcoirispos/backend/src/app/inventory/routes/items_routes.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/api/tax_rates_routes.py → /Volumes/dev/repos/arcoirispos/backend/src/app/pos/routes/tax_rates_routes.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/api/dev_bootstrap_routes.py → /Volumes/dev/repos/arcoirispos/backend/backup_unexpected/routes_misc/dev_bootstrap_routes.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/core/security/auth.py → /Volumes/dev/repos/arcoirispos/backend/src/app/auth/services/auth.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/core/security/dependencies.py → /Volumes/dev/repos/arcoirispos/backend/src/app/auth/services/dependencies.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/core/security/hashing.py → /Volumes/dev/repos/arcoirispos/backend/src/app/auth/services/hashing.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/core/security/jwt_utils.py → /Volumes/dev/repos/arcoirispos/backend/src/app/auth/services/jwt_utils.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/core/security/permissions.py → /Volumes/dev/repos/arcoirispos/backend/src/app/auth/services/permissions.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/core/security/roles.py → /Volumes/dev/repos/arcoirispos/backend/src/app/auth/services/roles.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/core/security/schemas.py → /Volumes/dev/repos/arcoirispos/backend/src/app/auth/services/schemas.py
+[MOVE] /Volumes/dev/repos/arcoirispos/backend/src/core/security/security.py → /Volumes/dev/repos/arcoirispos/backend/src/app/auth/services/security.py
+[DELETE] /Volumes/dev/repos/arcoirispos/backend/src/__pycache__
+[DELETE] /Volumes/dev/repos/arcoirispos/backend/src/core/__pycache__
+[DELETE] /Volumes/dev/repos/arcoirispos/backend/src/models/__pycache__
+[DELETE] /Volumes/dev/repos/arcoirispos/backend/src/schemas/__pycache__
+[DELETE] /Volumes/dev/repos/arcoirispos/backend/src/api/__pycache__
+[DELETE] /Volumes/dev/repos/arcoirispos/backend/src/services/__pycache__
+[DELETE] /Volumes/dev/repos/arcoirispos/backend/src/services/inv/__pycache__
+[DELETE] /Volumes/dev/repos/arcoirispos/backend/src/services/core/__pycache__
+[DELETE] /Volumes/dev/repos/arcoirispos/backend/src/services/pos/__pycache__
+[DELETE] /Volumes/dev/repos/arcoirispos/backend/src/services/core/repositories/__pycache__
+[DELETE] /Volumes/dev/repos/arcoirispos/backend/src/models/inv/__pycache__
+[DELETE] /Volumes/dev/repos/arcoirispos/backend/src/models/core/__pycache__
+[DELETE] /Volumes/dev/repos/arcoirispos/backend/src/models/pos/__pycache__
+[DELETE] /Volumes/dev/repos/arcoirispos/backend/src/models/acct/__pycache__
+[DELETE] /Volumes/dev/repos/arcoirispos/backend/src/core/security/__pycache__
+=== Refactor Completed ===
