@@ -34,6 +34,10 @@ async def get_session():
     async with AsyncSessionLocal() as session:
         yield session
 
+# Backwards compatibility for modules expecting get_async_session
+async def get_async_session():
+    async with AsyncSessionLocal() as session:
+        yield session
 
 # =============================================================
 # REQUIRED FOR ALEMBIC (env.py autogenerate)

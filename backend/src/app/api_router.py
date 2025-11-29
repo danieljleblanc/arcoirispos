@@ -17,6 +17,11 @@ from src.app.inventory.routes.stock_movements_routes import router as stock_move
 from src.app.inventory.routes.admin_stock_adjust_routes import router as admin_stock_adjust_routes
 
 # ---------------------------------------------------------
+# ORGANIZATION ROUTES 
+# ---------------------------------------------------------
+from src.app.org.routes.organization_settings_routes import router as org_settings_router
+
+# ---------------------------------------------------------
 # POS ROUTES
 # ---------------------------------------------------------
 from src.app.pos.routes.customer_routes import router as customer_routes
@@ -42,7 +47,7 @@ api_router.include_router(locations_routes)
 api_router.include_router(stock_levels_routes)
 api_router.include_router(stock_movements_routes)
 api_router.include_router(admin_stock_adjust_routes)
-
+api_router.include_router(org_settings_router)
 api_router.include_router(customer_routes)
 api_router.include_router(payments_routes)
 api_router.include_router(sale_lines_routes)

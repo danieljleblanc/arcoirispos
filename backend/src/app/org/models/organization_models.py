@@ -80,6 +80,13 @@ class Organization(Base):
         cascade="all, delete-orphan",
     )
 
+    # Org relationships
+    settings: Mapped["OrganizationSettings"] = relationship(
+    "OrganizationSettings",
+    back_populates="organization",
+    uselist=False,
+    )
+
     # POS relationships
     customers: Mapped[List["Customer"]] = relationship(
         "Customer",
