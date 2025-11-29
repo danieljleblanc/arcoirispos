@@ -18,7 +18,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.app.core.base import Base
-from src.app.pos.models.tax_rate_models import TaxRate as PosTaxRate
+from src.app.pos.models.tax_rate_models import TaxRate
 
 
 class Item(Base):
@@ -88,10 +88,7 @@ class Item(Base):
     )
 
     # ✔ Correct one-way relationship to POS TaxRate
-    tax_rate: Mapped[Optional[PosTaxRate]] = relationship(
-        "PosTaxRate",
-        lazy="joined",
-    )
+    tax_rate: Mapped["TaxRate"] = relationship("TaxRate", back_populates="items")
 
     sale_lines: Mapped[List["SaleLine"]] = relationship(
         "SaleLine",

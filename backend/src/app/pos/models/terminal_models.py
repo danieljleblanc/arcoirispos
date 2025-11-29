@@ -54,3 +54,9 @@ class Terminal(Base):
         "Sale",
         back_populates="terminal",
     )
+    
+    payments: Mapped[List["Payment"]] = relationship(
+    "Payment",
+    back_populates="terminal",
+    )
+

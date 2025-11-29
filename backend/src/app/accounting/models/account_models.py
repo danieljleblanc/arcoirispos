@@ -92,8 +92,23 @@ class ChartOfAccount(Base):
         back_populates="parent",
     )
 
+    # Journal lines that hit this account
     journal_lines: Mapped[List["JournalLine"]] = relationship(
         "JournalLine",
+        back_populates="account",
+        cascade="all, delete-orphan",
+    )
+
+    # Customer balances tied to this account
+    customer_balances: Mapped[List["CustomerBalance"]] = relationship(
+        "CustomerBalance",
+        back_populates="account",
+        cascade="all, delete-orphan",
+    )
+
+    # Bank accounts tied to this GL account
+    bank_accounts: Mapped[List["BankAccount"]] = relationship(
+        "BankAccount",
         back_populates="account",
         cascade="all, delete-orphan",
     )

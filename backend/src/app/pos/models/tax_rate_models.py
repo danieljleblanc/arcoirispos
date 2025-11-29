@@ -72,3 +72,9 @@ class TaxRate(Base):
         "SaleLine",
         back_populates="tax_rate",
     )
+    
+    items: Mapped[List["Item"]] = relationship(
+    "Item",
+    back_populates="tax_rate",
+    )
+

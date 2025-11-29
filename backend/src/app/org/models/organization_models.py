@@ -68,6 +68,17 @@ class Organization(Base):
     cascade="all, delete-orphan",
     )
 
+    bank_accounts: Mapped[List["BankAccount"]] = relationship(
+        "BankAccount",
+        back_populates="organization",
+        cascade="all, delete-orphan",
+    )
+
+    customer_balances: Mapped[List["CustomerBalance"]] = relationship(
+        "CustomerBalance",
+        back_populates="organization",
+        cascade="all, delete-orphan",
+    )
 
     # POS relationships
     customers: Mapped[List["Customer"]] = relationship(

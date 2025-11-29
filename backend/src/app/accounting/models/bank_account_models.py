@@ -1,3 +1,5 @@
+# backend/src/app/accounting/models/bank_account_models.py
+
 from __future__ import annotations
 
 import uuid
@@ -71,10 +73,8 @@ class BankAccount(Base):
 
     organization: Mapped["Organization"] = relationship(
         "Organization",
-        back_populates="bank_accounts",
     )
 
     account: Mapped["ChartOfAccount"] = relationship(
-        "ChartOfAccount",
-        back_populates="bank_accounts",
+        "ChartOfAccount", 
     )

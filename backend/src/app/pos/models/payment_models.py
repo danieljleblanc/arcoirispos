@@ -51,6 +51,12 @@ class Payment(Base):
         nullable=False,
         server_default=text("NOW()"),
     )
+    
+    terminal_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+    UUID(as_uuid=True),
+    ForeignKey("pos.terminals.terminal_id"),
+    )
+
 
     # ------------------------------------------------------
     # Relationships
@@ -63,4 +69,9 @@ class Payment(Base):
     organization: Mapped["Organization"] = relationship(
         "Organization",
         back_populates="payments",
+    )
+
+    terminal: Mapped[Optional["Terminal"]] = relationship(
+    "Terminal",
+    back_populates="payments",
     )

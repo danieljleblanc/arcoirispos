@@ -1,6 +1,6 @@
 FROM python:3.12-slim AS base
 
-# Install system dependencies needed for bcrypt, psycopg, etc.
+# Install system dependencies for bcrypt, psycopg, SQLAlchemy async
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libpq-dev \
@@ -12,20 +12,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-# Copy dependency file
+# Copy Python dependencies
 COPY requirements.txt .
 
-# Install Python packages
+# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the entire backend source code
+# Copy backend source code
 COPY src ./src
 
-# 🔥 ADD THIS LINE — VERY IMPORTANT
-COPY .env .env
+# Copy Alembic configuration + migrations
+COPY alembic.ini /app/alembic.ini
+COPY src/app/infrastructure/migrations /app/src/app/infrastructure/migrations
 
+# Expose FastAPI port
 EXPOSE 8000
 
-# Final CMD (only ONE allowed)
-# Note: docker-compose.yml overrides this, but keeping correct path for reference
-CMD ["bash", "-c", "uvicorn src.app.main:app --host 0.0.0.0 --port 8000 --reload"]
+# Default command (docker-compose may override in dev)
+CMD ["uvicorn", "src.app.main:app", "--host", "0.0.0.0", "--port", "8000"]

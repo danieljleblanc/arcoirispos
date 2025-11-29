@@ -160,4 +160,9 @@ class SaleLine(Base):
     organization: Mapped["Organization"] = relationship("Organization", back_populates="sale_lines")
     sale: Mapped["Sale"] = relationship("Sale", back_populates="sale_lines")
     item: Mapped["Item"] = relationship("Item", back_populates="sale_lines")
-    tax_rate: Mapped[Optional["TaxRate"]] = relationship("TaxRate", back_populates="sale_lines")
+    tax_rate: Mapped[Optional["TaxRate"]] = relationship(
+    "TaxRate",
+    lazy="joined",
+    )
+
+

@@ -52,6 +52,7 @@ class JournalEntry(Base):
     created_by: Mapped[Optional[uuid.UUID]] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("core.users.user_id"),
+        nullable=True,  # ✔ IMPORTANT FIX
     )
 
     created_at: Mapped[datetime] = mapped_column(
@@ -70,19 +71,19 @@ class JournalEntry(Base):
     # Relationships
     # ------------------------------------------------------
 
-    # (1) Organization → journal_entries
+    # Organization → journal_entries
     organization: Mapped["Organization"] = relationship(
         "Organization",
         back_populates="journal_entries",
     )
 
-    # (2) User → journal_entries_created
+    # User → journal_entries_created
     created_by_user: Mapped[Optional["User"]] = relationship(
         "User",
         back_populates="journal_entries_created",
     )
 
-    # (3) JournalEntry → JournalLine (one-to-many)
+    # JournalEntry → JournalLine
     journal_lines: Mapped[List["JournalLine"]] = relationship(
         "JournalLine",
         back_populates="journal_entry",

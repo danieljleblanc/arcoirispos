@@ -84,11 +84,6 @@ class JournalLine(Base):
         back_populates="journal_lines",
     )
 
-    organization: Mapped["Organization"] = relationship(
-        "Organization",
-        back_populates="journal_lines",
-    )
-
     account: Mapped["ChartOfAccount"] = relationship(
         "ChartOfAccount",
         back_populates="journal_lines",
