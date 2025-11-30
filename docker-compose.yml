@@ -19,7 +19,7 @@ services:
       timeout: 5s
       retries: 20
       start_period: 10s
-
+      
   fastapi:
     build:
       context: ./backend
@@ -34,6 +34,8 @@ services:
       DATABASE_URL: "postgresql://arcoiris_user:ArcoirisDevP%40ss2025@arcoirispos_postgres:5432/arcoirispos_dev"
     ports:
       - "8000:8000"
+    volumes:
+      - ./backend:/app        # <-- THIS IS THE FIX
     command: >
       bash -c "uvicorn src.app.main:app --host 0.0.0.0 --port 8000 --reload"
 

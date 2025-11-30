@@ -1,23 +1,22 @@
 """
-Init full schema
+Initial system schema
 
-Revision ID: d77fb4d8d6e4
-Revises: 000000000002
+Revision ID: 0001
+Revises:
+Create Date: 2025-11-27
 """
 
 from typing import Sequence, Union
-
 from alembic import op
 from sqlalchemy import text
 from src.app.core.base import Base
 
-# Import all models so Base.metadata is fully populated
+# Import all models so Base.metadata is populated
 from src.app.org.models import (
     organization_models,
     role_models,
     user_models,
 )
-
 from src.app.accounting.models import (
     account_models,
     bank_account_models,
@@ -25,14 +24,12 @@ from src.app.accounting.models import (
     journal_models,
     journal_line_models,
 )
-
 from src.app.inventory.models import (
     item_models,
     location_models,
     stock_level_models,
     stock_movement_models,
 )
-
 from src.app.pos.models import (
     customer_models,
     payment_models,
@@ -41,26 +38,37 @@ from src.app.pos.models import (
     tax_rate_models,
 )
 
-revision: str = "d77fb4d8d6e4"
-down_revision: Union[str, Sequence[str], None] = "000000000002"
+revision: str = "0001"
+down_revision: Union[str, Sequence[str], None] = None
 branch_labels = None
 depends_on = None
 
 
-def upgrade() -> None:
-    # Always use Alembic's connection (DO NOT create a new engine)
+def upgrade():
     bind = op.get_bind()
 
-    # Ensure schemas exist (safe even if they already exist)
+    # Extensions
+    bind.execute(text("CREATE EXTENSION IF NOT EXISTS citext"))
+    bind.execute(text("CREATE EXTENSION IF NOT EXISTS pgcrypto"))
+
+    # Schemas
     bind.execute(text("CREATE SCHEMA IF NOT EXISTS core"))
     bind.execute(text("CREATE SCHEMA IF NOT EXISTS acct"))
     bind.execute(text("CREATE SCHEMA IF NOT EXISTS inv"))
     bind.execute(text("CREATE SCHEMA IF NOT EXISTS pos"))
 
-    # Now create all tables using Alembic's same transactional connection
+    # Tables
     Base.metadata.create_all(bind=bind)
 
 
-def downgrade() -> None:
+def downgrade():
     bind = op.get_bind()
     Base.metadata.drop_all(bind=bind)
+
+    bind.execute(text("DROP SCHEMA IF EXISTS pos CASCADE"))
+    bind.execute(text("DROP SCHEMA IF EXISTS inv CASCADE"))
+    bind.execute(text("DROP SCHEMA IF EXISTS acct CASCADE"))
+    bind.execute(text("DROP SCHEMA IF EXISTS core CASCADE"))
+
+    bind.execute(text("DROP EXTENSION IF EXISTS pgcrypto CASCADE"))
+    bind.execute(text("DROP EXTENSION IF EXISTS citext CASCADE"))
