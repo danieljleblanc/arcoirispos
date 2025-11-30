@@ -30,13 +30,10 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      DATABASE_URL_ASYNC: "postgresql+asyncpg://arcoiris_user:ArcoirisDevP%40ss2025@postgres:5432/arcoirispos_dev"
-      DATABASE_URL: "postgresql://arcoiris_user:ArcoirisDevP%40ss2025@postgres:5432/arcoirispos_dev"
+      DATABASE_URL_ASYNC: "postgresql+asyncpg://arcoiris_user:ArcoirisDevP%40ss2025@arcoirispos_postgres:5432/arcoirispos_dev"
+      DATABASE_URL: "postgresql://arcoiris_user:ArcoirisDevP%40ss2025@arcoirispos_postgres:5432/arcoirispos_dev"
     ports:
       - "8000:8000"
-    # If you want, we can restore this later for hot-reload development:
-    # volumes:
-    #   - ./backend:/app
     command: >
       bash -c "uvicorn src.app.main:app --host 0.0.0.0 --port 8000 --reload"
 

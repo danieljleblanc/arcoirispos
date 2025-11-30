@@ -1,4 +1,4 @@
-# backend/src/app/accounting/enums/models.py
+# backend/src/app/accounting/enums/enum.py
 
 from __future__ import annotations
 
@@ -11,22 +11,20 @@ class AcctEntryTypeEnum(str, Enum):
     CREDIT = "credit"
 
 
-# --------------------------------------------------------------------
-# SQLAlchemy-safe ENUM for mapped_column usage
-# - Uses values_callable so DB stores pure strings
-# - native_enum=False keeps migrations predictable
-# - schema="acct" ensures the enum lives in correct schema
-# --------------------------------------------------------------------
-acct_entry_type_enum = SAEnum(
-    AcctEntryTypeEnum,
-    name="acct_entry_type_enum",
-    values_callable=lambda x: [e.value for e in x],
-    native_enum=False,
-    schema="acct",
-)
+# --------------------------------------------------------------
+# SQLAlchemy-safe ENUM factory (NOT executed at import time)
+# --------------------------------------------------------------
+def get_acct_entry_type_enum():
+    return SAEnum(
+        AcctEntryTypeEnum,
+        name="acct_entry_type_enum",
+        values_callable=lambda x: [e.value for e in x],
+        native_enum=False,
+        schema="acct",
+    )
 
 
 __all__ = [
     "AcctEntryTypeEnum",
-    "acct_entry_type_enum",
+    "get_acct_entry_type_enum",
 ]

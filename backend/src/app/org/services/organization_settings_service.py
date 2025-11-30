@@ -1,7 +1,9 @@
 from __future__ import annotations
+
 from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.app.org.models.organization_settings_model import OrganizationSettings
 from src.app.org.repositories.organization_settings_repository import (
     get_settings_by_org_id,
     update_settings,
@@ -10,12 +12,19 @@ from src.app.org.repositories.organization_settings_repository import (
 from src.app.org.schemas.organization_settings_schema import (
     OrganizationSettingsUpdate,
 )
-from src.app.org.models.organization_settings_model import (
-    ROUNDING_MODES,
-    ROUNDING_TARGETS,
-    INVENTORY_MODES,
-    OrganizationSettings,
+from src.app.org.enums.models import (
+    RoundingModeEnum,
+    RoundingApplyToEnum,
+    InventoryModeEnum,
 )
+
+# -------------------------------------------------------------------
+# Allowed enum values (clean, Python-driven — never DB-driven)
+# -------------------------------------------------------------------
+ROUNDING_MODES = [e.value for e in RoundingModeEnum]
+ROUNDING_TARGETS = [e.value for e in RoundingApplyToEnum]
+INVENTORY_MODES = [e.value for e in InventoryModeEnum]
+
 
 # ---------------------------------------------------------
 # Get or create settings for an organization
@@ -62,11 +71,9 @@ async def update_org_settings_service(
     validate_inventory_mode(data.get("inventory_mode"))
 
     # Auto-rules:
-    # If rounding disabled, disable application rules
     if data.get("rounding_mode") == "none":
         data["rounding_apply_to"] = "none"
 
-    # If rounding enabled but target not provided → default to cash_only
     if (
         data.get("rounding_mode")
         and data["rounding_mode"] != "none"

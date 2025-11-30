@@ -20,7 +20,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.app.core.base import Base
-from src.app.accounting.models.enums import acct_entry_type_enum
+from src.app.accounting.enums.models import get_acct_entry_type_enum
 
 
 class JournalLine(Base):
@@ -58,7 +58,7 @@ class JournalLine(Base):
     )
 
     entry_type: Mapped[str] = mapped_column(
-        acct_entry_type_enum,
+        get_acct_entry_type_enum(),
         nullable=False,
     )
 

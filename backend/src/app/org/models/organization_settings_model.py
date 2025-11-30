@@ -11,8 +11,6 @@ from sqlalchemy import (
     DateTime,
     Text,
     ForeignKey,
-    Enum,
-    Numeric,
     text,
 )
 from sqlalchemy.dialects.postgresql import UUID
@@ -20,28 +18,14 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.app.core.base import Base
 
-
 # ------------------------------------------------------
-# ENUMS
+# ENUM FACTORIES
 # ------------------------------------------------------
 
-ROUNDING_MODES = (
-    "none",
-    "nickel",
-    "dime",
-    "quarter",
-    "dollar",
-)
-
-INVENTORY_MODES = (
-    "deduct_on_cart",
-    "deduct_on_sale",
-)
-
-ROUNDING_TARGETS = (
-    "none",
-    "cash_only",
-    "all_payments",
+from src.app.org.enums.models import (
+    get_rounding_mode_enum,
+    get_rounding_apply_to_enum,
+    get_inventory_mode_enum,
 )
 
 
@@ -66,13 +50,13 @@ class OrganizationSettings(Base):
     # Rounding configuration
     # -----------------------------
     rounding_mode: Mapped[str] = mapped_column(
-        Enum(*ROUNDING_MODES, name="rounding_mode"),
+        get_rounding_mode_enum(),
         nullable=False,
         server_default=text("'none'"),
     )
 
     rounding_apply_to: Mapped[str] = mapped_column(
-        Enum(*ROUNDING_TARGETS, name="rounding_targets"),
+        get_rounding_apply_to_enum(),
         nullable=False,
         server_default=text("'cash_only'"),
     )
@@ -81,7 +65,7 @@ class OrganizationSettings(Base):
     # Inventory behavior
     # -----------------------------
     inventory_mode: Mapped[str] = mapped_column(
-        Enum(*INVENTORY_MODES, name="inventory_mode"),
+        get_inventory_mode_enum(),
         nullable=False,
         server_default=text("'deduct_on_cart'"),
     )
