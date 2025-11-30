@@ -5,50 +5,45 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ---
 
-## [0.10.1] — 2025-11-22
-### Added
-- Introduced unified **OrgContext (Option A+) architecture** using X-Org-ID header.
-- Implemented the new `src/core/security/org_context.py` module.
-- Added centralized RBAC dependencies using `require_any_staff` and `require_admin`.
+## [0.12.0] — 2025-11-30
+### 🚀 Unified Migration Baseline & Backend Stabilization
 
-### Changed
-- Refactored all API route files to use the new org context signature.
-- Updated authentication pipeline to align with new RBAC and org_id flow.
-- Normalized database access patterns across POS and Inventory modules.
-- Rebuilt Alembic seed migration with corrected bcrypt hashes.
-- Updated security configuration and internal dependency wiring.
+This release establishes a clean, authoritative migration baseline and stabilizes
+the entire backend development environment, resolving issues with Alembic
+migration drift, Docker filesystem divergence, and inconsistent schema state
+between environments.
 
-### Fixed
-- Login failures due to incompatible bcrypt hashes.
-- Swagger authentication flow (Bearer token now loads correctly).
-- Route-level permission inconsistencies across POS/INV endpoints.
-- Removed old legacy route prototypes under `src/api/api_old`.
+#### 🧩 Migration System Overhaul
+- Removed all previous Alembic migration revisions.
+- Introduced a single authoritative baseline:
+  - `0001_initial_system_schema.py`
+- Ensures correct creation of:
+  - PostgreSQL extensions `citext` and `pgcrypto`
+  - Application schemas `core`, `acct`, `inv`, `pos`
+- Uses Alembic-managed connections reliably (`op.get_bind()`).
+- Eliminated previously duplicated and conflicting migration chains.
 
-### Removed
-- Deleted all deprecated route definitions under `src/api/api_old/`.
+#### 🔧 Backend Environment Stabilization
+- Restored correct volume mount for backend service (`./backend:/app`).
+- Eliminated container/host filesystem divergence.
+- Ensures Alembic-generated migrations appear instantly on the host filesystem.
+- Rebuilt development environment for consistency across rebuilds.
 
----
+#### 🗄️ Schema Initialization Verification
+- Verified fresh DB initialization produces all expected tables across:
+  - **core**, **acct**, **inv**, **pos**
+- Confirmed Alembic HEAD aligns with `0001` after reset.
 
-## [0.10.0] — 2025-11-18
-### Added
-- Initial multi-org scaffolding.
-- RBAC foundation (Role enum, UserOrgRole).
-- First pass of security dependencies.
-- POS + Inventory module routing structure.
+#### 📝 Documentation
+- Added updated migration README files.
+- Attached `backend.zip` snapshot to the GitHub release.
+- Updated backend project structure documentation.
 
----
-
-## [0.9.0] — 2025-11-10
-### Added
-- Stable POS core (sales, items, customers, terminals).
-- Stable Inventory core (locations, stock levels, movements).
-- JWT authentication and refresh pipeline.
-- Full Docker-based development environment.
-
----
-
-## [0.8.0] — 2025-11-01
-*Historic foundational commits.*
-
----
-
+#### Developer Notes
+After pulling this version:
+- Reset your local Postgres volume.
+- Rebuild Docker.
+- Apply migrations with `alembic upgrade head`.
+- Future migrations should now safely use:
+  ```bash
+  alembic revision --autogenerate -m "Describe your change"

@@ -7,13 +7,12 @@ from datetime import datetime
 from typing import List, Optional
 
 from sqlalchemy import (
-    Boolean,
     DateTime,
     Text,
     ForeignKey,
     text,
 )
-from sqlalchemy.dialects.postgresql import UUID, CITEXT, JSONB
+from sqlalchemy.dialects.postgresql import UUID, CITEXT
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.app.core.base import Base
@@ -35,16 +34,27 @@ class Customer(Base):
         nullable=False,
     )
 
-    external_ref: Mapped[Optional[str]] = mapped_column(Text)
-    full_name: Mapped[str] = mapped_column(Text, nullable=False)
+    # -----------------------------
+    # Identity
+    # -----------------------------
+    first_name: Mapped[str] = mapped_column(Text, nullable=False)
+    middle_name: Mapped[Optional[str]] = mapped_column(Text)
+    last_name: Mapped[str] = mapped_column(Text, nullable=False)
+
     email: Mapped[Optional[str]] = mapped_column(CITEXT)
     phone: Mapped[Optional[str]] = mapped_column(Text)
 
-    billing_address: Mapped[Optional[dict]] = mapped_column(JSONB)
-    shipping_address: Mapped[Optional[dict]] = mapped_column(JSONB)
+    # -----------------------------
+    # Address
+    # -----------------------------
+    street_address: Mapped[Optional[str]] = mapped_column(Text)
+    city: Mapped[Optional[str]] = mapped_column(Text)
+    state: Mapped[Optional[str]] = mapped_column(Text)
+    zip: Mapped[Optional[str]] = mapped_column(Text)
 
-    notes: Mapped[Optional[str]] = mapped_column(Text)
-
+    # -----------------------------
+    # Metadata
+    # -----------------------------
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
@@ -57,11 +67,15 @@ class Customer(Base):
         server_default=text("NOW()"),
     )
 
+    created_by: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True))
+    last_edited_by: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True))
+    last_edited_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
+
     deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
 
-    # ------------------------------------------------------
+    # -----------------------------
     # Relationships
-    # ------------------------------------------------------
+    # -----------------------------
     organization: Mapped["Organization"] = relationship(
         "Organization",
         back_populates="customers",
