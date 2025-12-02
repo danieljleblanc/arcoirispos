@@ -1,36 +1,30 @@
-# src/app/auth/services/org_context.py
+# backend/src/app/auth/services/org_context.py
 
-from __future__ import annotations
-
-from fastapi import Depends
+from fastapi import Depends, Header, HTTPException, status
 from uuid import UUID
 
-# These imports are valid and match your directory layout
-from src.app.org.models.user_models import User
+from src.app.auth.services.auth import get_current_user
 from src.app.org.models.organization_models import Organization
 
 
 async def get_current_org(
-    user: User = Depends(),
+    current_user = Depends(get_current_user),
+    x_org_id: UUID | None = Header(None, alias="X-Org-ID"),
 ):
     """
-    Temporary safe placeholder implementation.
-
-    Until real organization resolution logic is rebuilt, this
-    returns a minimal synthetic org context object shaped exactly
-    like the real one so downstream dependencies do not break.
-
-    Real version will:
-        - Read X-Org-ID header
-        - Verify membership via UserOrgRole table
-        - Attach role and org to context
+    Temporary working OrgContext:
+    - Reads X-Org-ID correctly
+    - Returns minimal org context
     """
+    if x_org_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="X-Org-ID header is required",
+        )
 
-    # Minimal synthetic object with required structure.
-    # Enough for routes and permission checks not to explode.
-
+    # Synthetic org (only for placeholder)
     fake_org = Organization(
-        org_id=UUID("00000000-0000-0000-0000-000000000000"),
+        org_id=x_org_id,
         name="TEMP_ORG",
         legal_name=None,
         display_name=None,
@@ -40,6 +34,7 @@ async def get_current_org(
     )
 
     return {
+        "org_id": x_org_id,
         "org": fake_org,
-        "role": "admin",  # permissive placeholder until RBAC restored
+        "role": "admin",  # placeholder for RBAC
     }

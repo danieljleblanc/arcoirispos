@@ -39,7 +39,7 @@ async def list_items(
     org_ctx = Depends(get_current_org),
     user    = Depends(require_any_staff_org),
 ):
-    org_id = getattr(org_ctx, "org_id", None)
+    org_id = org_ctx["org"].org_id
     return await item_service.get_by_org(session, org_id, limit, offset)
 
 
@@ -53,7 +53,7 @@ async def get_item(
     org_ctx = Depends(get_current_org),
     user    = Depends(require_any_staff_org),
 ):
-    org_id = getattr(org_ctx, "org_id", None)
+    org_id = org_ctx["org"].org_id
     item = await item_service.get_by_id(session, item_id)
 
     if not item or item.org_id != org_id:
@@ -75,7 +75,7 @@ async def create_item(
     org_ctx = Depends(get_current_org),
     user    = Depends(require_admin_org),
 ):
-    org_id = getattr(org_ctx, "org_id", None)
+    org_id = org_ctx["org"].org_id
 
     data = payload.dict()
     data["org_id"] = org_id
@@ -97,7 +97,7 @@ async def update_item(
     org_ctx = Depends(get_current_org),
     user    = Depends(require_admin_org),
 ):
-    org_id = getattr(org_ctx, "org_id", None)
+    org_id = org_ctx["org"].org_id
     item = await item_service.get_by_id(session, item_id)
 
     if not item or item.org_id != org_id:
@@ -124,7 +124,7 @@ async def delete_item(
     org_ctx = Depends(get_current_org),
     user    = Depends(require_admin_org),
 ):
-    org_id = getattr(org_ctx, "org_id", None)
+    org_id = org_ctx["org"].org_id
     item = await item_service.get_by_id(session, item_id)
 
     if not item or item.org_id != org_id:

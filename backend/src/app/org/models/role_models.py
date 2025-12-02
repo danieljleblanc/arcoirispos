@@ -25,6 +25,7 @@ class UserRole(str, Enum):
     ADMIN = "admin"
     MANAGER = "manager"
     CASHIER = "cashier"
+    SUPPORT = "support"
     VIEWER = "viewer"
 
 
